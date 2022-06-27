@@ -3,6 +3,7 @@ from piece import Pawn, Knight, Bishop, King, Queen, Rook, is_in_check,find_king
 import pygame 
 
 def return_all_legal_moves(board, colour="black"): 
+    print('hi')
     valid = []
     for i in range(8):
         for j in range(8):
