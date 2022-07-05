@@ -93,9 +93,9 @@ class Piece:
         self.img_width = 60
         self.width_offset = 5
         self.height_offset = 5
-        self.set = 'lichess-set'
-        # self.set = 'set-5'
-        # self.set = 'set-6'
+        # self.set = 'lichess-set'
+        self.set = 'set-5'
+        self.set = 'set-6'
 
 
     def draw(self, x,y):
