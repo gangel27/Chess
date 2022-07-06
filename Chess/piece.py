@@ -20,8 +20,6 @@ def filter_legal_moves_for_check(local_board, row,col,legal_moves,colour_moving)
         editing_board[move[0]][move[1]] = editing_board[row][col] 
         editing_board[row][col] = 0
 
-        
-
         if is_in_check(editing_board, colour_moving):
             removing.append(move)
 
@@ -96,13 +94,13 @@ class Piece:
         # self.set = 'lichess-set'
         self.set = 'set-5'
         self.set = 'set-6'
+        self.set = 'lichess-set'
+        self.follow_mouse = False
 
 
     def draw(self, x,y):
-        # x += (self.width_offset)
-
-        # y += (self.height_offset)
-
+        if self.follow_mouse: 
+            x,y = pygame.mouse.get_pos()
         if self.colour == "white":
             img = self.image_white
             rect = img.get_rect()

@@ -23,10 +23,13 @@ def main():
                 running = False
                 pygame.quit()
                 sys.exit()
-            if event.type == pygame.MOUSEBUTTONUP:
+            if event.type == pygame.MOUSEBUTTONDOWN:
                 x,y = pygame.mouse.get_pos()
-                board.process_square_click(x,y)
-                
+                board.process_square_click(x,y,"down")
+            elif event.type == pygame.MOUSEBUTTONUP: 
+                x,y = pygame.mouse.get_pos()
+                board.process_square_click(x,y,"up")
+            
         screen.fill((21, 21, 18))
         board.draw_board()
         

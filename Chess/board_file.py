@@ -110,12 +110,12 @@ class Board:
         self.draw_last_move()
         self.draw_if_in_check()
         self.draw_highlighted_selected_square()
-        
-        self.draw_pieces()
         self.draw_highlighted_legal_moves()
+        self.draw_pieces()
+
         self.draw_if_in_checkmate()   
-        x = Thread(target=self.simulate_bot())
-        x.start()  
+        # x = Thread(target=self.simulate_bot())
+        # x.start()  
     
     def draw_last_move(self):
         if self.last_move_from != (-1,-1) and self.last_move_to != (-1,-1):
@@ -140,14 +140,25 @@ class Board:
                     pygame.draw.rect(self.screen, self.HIGHLIGHT_COLOUR_LEGAL_MOVE, higlighted_square,self.HIGHLIGHT_THICKNESS_LEGAL_MOVE)
 
     def draw_pieces(self):
+        squares = []
         for i in range(8):
             for j in range(8):
                 square = self.board[i][j]
                 if square != 0:
-                    x,y = self.row_col_to_coordinates_conversion(i,j)
-                    x += self.SQUARE_DIMENSION//2
-                    y += self.SQUARE_DIMENSION//2
-                    square.draw(x,y)
+                    if square.colour != self.current_colour_moving:
+                        x,y = self.row_col_to_coordinates_conversion(i,j)
+                        x += self.SQUARE_DIMENSION//2
+                        y += self.SQUARE_DIMENSION//2
+                        square.draw(x,y)
+                    else: 
+                        squares.append([i,j])
+        for i,j in squares: 
+            x,y = self.row_col_to_coordinates_conversion(i,j)
+            x += self.SQUARE_DIMENSION//2
+            y += self.SQUARE_DIMENSION//2
+            self.board[i][j].draw(x,y)
+
+
 
     def draw_highlighted_selected_square(self):
         if self.selected_moving_square != (-1,-1):
@@ -214,26 +225,27 @@ class Board:
         # unhighlight piece. 
         # remove legal moves 
         if row != -1 and col != -1:
-            self.board[row][col] = self.board[self.selected_moving_square[0]][self.selected_moving_square[1]]
-            self.board[self.selected_moving_square[0]][self.selected_moving_square[1]] = 0
-            self.last_move_from = self.selected_moving_square
-            self.last_move_to = (row,col)
-            self.legal_moves_for_selected_piece = [(-1,-1)]
-            self.selected_moving_square = (-1,-1)
+            if self.selected_moving_square != (-1,-1):
+                self.board[row][col] = self.board[self.selected_moving_square[0]][self.selected_moving_square[1]]
+                self.board[self.selected_moving_square[0]][self.selected_moving_square[1]] = 0
+                self.last_move_from = self.selected_moving_square
+                self.last_move_to = (row,col)
+                self.legal_moves_for_selected_piece = [(-1,-1)]
+                self.selected_moving_square = (-1,-1)
 
-            self.check_if_castling(row,col) # moves rook 
-            self.check_if_promotion(row,col)
-            self.check_if_en_passant(row,col)
-            self.alternate_move_color()
-            self.set_pawns_just_moved_2_squares_false() # just_moved_2_squares = False
-        
-            if self.board[row][col].name == "pawn" or self.board[row][col].name=="rook" or self.board[row][col].name=="king":
-                self.board[row][col].moved = True
+                self.check_if_castling(row,col) # moves rook 
+                self.check_if_promotion(row,col)
+                self.check_if_en_passant(row,col)
+                self.alternate_move_color()
+                self.set_pawns_just_moved_2_squares_false() # just_moved_2_squares = False
             
-            if self.board[row][col].name == "pawn": # for en passant
-                squares_moved = abs(self.last_move_from[0]- self.last_move_to[0])
-                if squares_moved == 2:
-                    self.board[row][col].just_moved_2_squares = True
+                if self.board[row][col].name == "pawn" or self.board[row][col].name=="rook" or self.board[row][col].name=="king":
+                    self.board[row][col].moved = True
+                
+                if self.board[row][col].name == "pawn": # for en passant
+                    squares_moved = abs(self.last_move_from[0]- self.last_move_to[0])
+                    if squares_moved == 2:
+                        self.board[row][col].just_moved_2_squares = True
     
     def check_if_en_passant(self,row,col):
         en_passant_to_rank = 5
@@ -301,7 +313,7 @@ class Board:
         else:
             self.current_colour_moving = "white"
 
-    def process_square_click(self,x,y):
+    def process_square_click(self,x,y,click_type):
         '''
         FIRST: convert, using coordinates_to_row_col_conversion()
         2 possible valid clicks 2) selecting a piece 1) moving an already selected piece.
@@ -334,25 +346,51 @@ class Board:
         if not is_processed:  # moves a piece
             for legal_move in self.legal_moves_for_selected_piece:
                 if (row,col) == legal_move:
+
+
+                    self.board[self.selected_moving_square[0]][self.selected_moving_square[1]].follow_mouse = False 
                     self.move_selected_piece(row,col)
                     if is_in_check(self.board, self.current_colour_moving):
                         self.check_pos = find_king_pos(self.board, self.current_colour_moving)
                         self.currently_in_check = True 
                         self.in_checkmate = is_in_checkmate(self.board, self.current_colour_moving)
+                        
                     else:
                         self.currently_in_check = False
                         self.check_pos = (-1,-1)
-                    
                     is_processed = True
 
-        if not is_processed: # highlights a square
-            if not error: 
-                self.selected_moving_square = (row,col)
+            
+        
+        if not is_processed: # puts piece back in place if not in moved square
+            if (row,col) == self.selected_moving_square: 
                 if self.board[row][col] != 0:
-                    self.legal_moves_for_selected_piece = self.board[row][col].legal_moves(self.board, row,col, self.current_colour_moving)
+                    if self.board[row][col].colour == self.current_colour_moving:
+                        if click_type == "up":
+                            self.board[row][col].follow_mouse = False
 
-                else:
+                            is_processed = True
+            else: 
+                # legal moves have already been filtered out, so we know that this move has to be a none move
+                if self.board[self.selected_moving_square[0]][self.selected_moving_square[1]] != 0:
+                    self.board[self.selected_moving_square[0]][self.selected_moving_square[1]].follow_mouse = False 
+                    self.selected_moving_square = (-1,-1)
                     self.legal_moves_for_selected_piece = [(-1,-1)]
+                
+
+
+        if not is_processed: # highlights a square also want the piece to follow the mouse 
+            if not error: 
+                print(row,col)
+                if self.board[row][col] != 0:
+                    self.selected_moving_square = (row,col)
+                    if self.board[row][col] != 0:
+                        self.legal_moves_for_selected_piece = self.board[row][col].legal_moves(self.board, row,col, self.current_colour_moving)
+                        if click_type == "down":
+                            if self.board[row][col].colour == self.current_colour_moving:
+                                self.board[row][col].follow_mouse = True 
+                    else:
+                        self.legal_moves_for_selected_piece = [(-1,-1)]
             else: # clicked outside the range of the board
                 self.selected_moving_square = (-1,-1)
                 self.legal_moves_for_selected_piece = [(-1,-1)]
