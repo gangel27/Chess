@@ -35,6 +35,12 @@ class Board:
         LICHESS_LEGAL = (135, 120, 79)
         LICHESS_BROWN = (181, 136, 98)
         LICHESS_WHITE = (240, 217, 181)
+        LICHESS_COLD_BLUE = (125,161,172)
+        LICHESS_COLD_WHITE = (223,227,230)
+        LICHESS_COLD_HIGHLIGHT = (92,122,104)
+        LICHESS_COLD_LEGAL_MOVE = (93,122,104)
+        LICHESS_COLD_MOVE_FROM = (131,155,133)
+        LICHESS_COLD_MOVE_TO = (152,176,127)
 
         self.TOP_MARGIN = 100
         self.LEFT_MARGIN = 100
@@ -50,6 +56,7 @@ class Board:
         self.HIGHLIGHT_COLOUR_SELECTED_PIECE = LICHESS_HIGHLIGHT
         self.HIGHLIGHT_THICKNESS_SELECTED_PIECE = 5
         self.HIGHLIGHT_COLOUR_LEGAL_MOVE = LICHESS_LEGAL
+        
         self.CIRCLE_RADIUS_LEGAL_MOVE = 10
         self.HIGHLIGHT_COLOUR_CHECK = RED
         self.HIGLIGHT_THICKNESS_CHECK = 5
@@ -305,7 +312,17 @@ class Board:
                                 self.board[row][col].castled = True
  
 
-    
+    def undo_last_move(self): 
+        pass
+        if self.last_move_from != (-1,-1) or self.last_move_to != (-1,-1):
+            self.board[self.last_move_from[0]][self.last_move_from[1]] = self.board[self.last_move_to[0]][self.last_move_to[1]]
+            self.board[self.last_move_to[0]][self.last_move_to[1]] = 0
+            self.selected_moving_square = (-1,-1)
+            self.legal_moves_for_selected_piece = [(-1,-1)]
+            self.last_move_from = (-1,-1)
+            self.last_move_to = (-1,-1)
+            self.alternate_move_color() # reverts move colour back
+
 
     def alternate_move_color(self):
         if self.current_colour_moving == "white":
@@ -347,8 +364,8 @@ class Board:
             for legal_move in self.legal_moves_for_selected_piece:
                 if (row,col) == legal_move:
 
-
-                    self.board[self.selected_moving_square[0]][self.selected_moving_square[1]].follow_mouse = False 
+                    if self.board[self.selected_moving_square[0]][self.selected_moving_square[1]] != 0:
+                        self.board[self.selected_moving_square[0]][self.selected_moving_square[1]].follow_mouse = False 
                     self.move_selected_piece(row,col)
                     if is_in_check(self.board, self.current_colour_moving):
                         self.check_pos = find_king_pos(self.board, self.current_colour_moving)
@@ -381,7 +398,6 @@ class Board:
 
         if not is_processed: # highlights a square also want the piece to follow the mouse 
             if not error: 
-                print(row,col)
                 if self.board[row][col] != 0:
                     self.selected_moving_square = (row,col)
                     if self.board[row][col] != 0:

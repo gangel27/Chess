@@ -29,6 +29,9 @@ def main():
             elif event.type == pygame.MOUSEBUTTONUP: 
                 x,y = pygame.mouse.get_pos()
                 board.process_square_click(x,y,"up")
+            elif event.type == pygame.KEYDOWN: 
+                if event.key == pygame.K_LEFT: 
+                    board.undo_last_move()
             
         screen.fill((21, 21, 18))
         board.draw_board()
