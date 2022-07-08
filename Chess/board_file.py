@@ -9,7 +9,7 @@ from bot import Material_Bot, Search_Tree_bot
 
 
 class Board: 
-    def __init__(self, screen): 
+    def __init__(self, screen,is_inverted=False): 
         self.board = [[0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0],
@@ -78,6 +78,7 @@ class Board:
 
         self.minmax_bot = Search_Tree_bot()
         self.bot_depth = 3
+        self.is_inverted = is_inverted
 
         self.screen = screen
         
@@ -203,29 +204,55 @@ class Board:
         self.last_move_to = (-1,-1)
         self.in_checkmate = False 
         
-        # puts all pieces on the starting square
-        for i in range(8): # pawns 
-            self.board[6][i] =  Pawn(self.screen,"white")
-            self.board[1][i] =  Pawn(self.screen,"black")
-        
-      
-        self.board[7][0] = Rook(self.screen,"white")
-        self.board[7][1] = Knight(self.screen,"white")
-        self.board[7][2] = Bishop(self.screen,"white")
-        self.board[7][3] = Queen(self.screen,"white")
-        self.board[7][4] = King(self.screen,"white")
-        self.board[7][5] = Bishop(self.screen,"white")
-        self.board[7][6] = Knight(self.screen,"white")
-        self.board[7][7] = Rook(self.screen,"white")
+        if not self.is_inverted:
 
-        self.board[0][0] = Rook(self.screen,"black")
-        self.board[0][1] = Knight(self.screen,"black")
-        self.board[0][2] = Bishop(self.screen,"black")
-        self.board[0][3] = Queen(self.screen,"black")
-        self.board[0][4] = King(self.screen,"black")
-        self.board[0][5] = Bishop(self.screen,"black")
-        self.board[0][6] = Knight(self.screen,"black")
-        self.board[0][7] = Rook(self.screen,"black")
+            for i in range(8): # pawns 
+                self.board[6][i] =  Pawn(self.screen,"white")
+                self.board[1][i] =  Pawn(self.screen,"black")
+            
+        
+            self.board[7][0] = Rook(self.screen,"white")
+            self.board[7][1] = Knight(self.screen,"white")
+            self.board[7][2] = Bishop(self.screen,"white")
+            self.board[7][3] = Queen(self.screen,"white")
+            self.board[7][4] = King(self.screen,"white")
+            self.board[7][5] = Bishop(self.screen,"white")
+            self.board[7][6] = Knight(self.screen,"white")
+            self.board[7][7] = Rook(self.screen,"white")
+
+            self.board[0][0] = Rook(self.screen,"black")
+            self.board[0][1] = Knight(self.screen,"black")
+            self.board[0][2] = Bishop(self.screen,"black")
+            self.board[0][3] = Queen(self.screen,"black")
+            self.board[0][4] = King(self.screen,"black")
+            self.board[0][5] = Bishop(self.screen,"black")
+            self.board[0][6] = Knight(self.screen,"black")
+            self.board[0][7] = Rook(self.screen,"black")
+
+        else: 
+            for i in range(8): # pawns 
+                self.board[6][i] =  Pawn(self.screen,"black",True)
+                self.board[1][i] =  Pawn(self.screen,"white",True)
+            
+        
+            self.board[7][0] = Rook(self.screen,"black")
+            self.board[7][1] = Knight(self.screen,"black")
+            self.board[7][2] = Bishop(self.screen,"black")
+            self.board[7][4] = Queen(self.screen,"black")
+            self.board[7][3] = King(self.screen,"black",True)
+            self.board[7][5] = Bishop(self.screen,"black")
+            self.board[7][6] = Knight(self.screen,"black")
+            self.board[7][7] = Rook(self.screen,"black")
+
+            self.board[0][0] = Rook(self.screen,"white")
+            self.board[0][1] = Knight(self.screen,"white")
+            self.board[0][2] = Bishop(self.screen,"white")
+            self.board[0][4] = Queen(self.screen,"white")
+            self.board[0][3] = King(self.screen,"white",True)
+            self.board[0][5] = Bishop(self.screen,"white")
+            self.board[0][6] = Knight(self.screen,"white")
+            self.board[0][7] = Rook(self.screen,"white")
+
 
     def move_selected_piece(self,row,col):
         # moves the currently selecting moving piece, to the square taken as a paramter, has already been checked for legality 
@@ -255,14 +282,24 @@ class Board:
                         self.board[row][col].just_moved_2_squares = True
     
     def check_if_en_passant(self,row,col):
-        en_passant_to_rank = 5
-        en_passant_from_rank = 4
-        moving = -1
         if self.current_colour_moving == "white":
             en_passant_to_rank = 2
             en_passant_from_rank = 3
             moving = 1
-        
+            if self.is_inverted: 
+                en_passant_to_rank = 5
+                en_passant_from_rank = 4
+                moving = -1
+
+        elif self.current_colour_moving == "black":
+            en_passant_to_rank = 5
+            en_passant_from_rank = 4
+            moving = -1
+            if self.is_inverted: 
+                en_passant_to_rank = 2
+                en_passant_from_rank = 3
+                moving = 1
+
         if row == en_passant_to_rank:
             if self.last_move_from[0] == en_passant_from_rank:
                 if abs(col-self.last_move_from[1]) == 1: # moved one column over
@@ -277,9 +314,15 @@ class Board:
                         self.board[i][j].just_moved_2_squares = False
 
     def check_if_promotion(self,row,col):
-        end_rank = 7
+    
         if self.current_colour_moving == "white":
             end_rank = 0
+            if self.is_inverted: 
+                end_rank = 7
+        else: 
+            end_rank = 7 
+            if self.is_inverted:
+                end_rank = 0 
         
         if row == end_rank and self.board[row][col].name == "pawn": 
             self.board[row][col] = Queen(self.screen, self.current_colour_moving)
@@ -287,28 +330,45 @@ class Board:
     def check_if_castling(self,row,col):
         if self.current_colour_moving == "white":
             home = 7
+            if self.is_inverted: 
+                home = 0 
         else: # black 
             home = 0
+            if self.is_inverted: 
+                home = 7 
+        
+        
+        king_starting_col = 4 
+        kingside_dir = 1 
+        queenside_dir = -1 
+        king_rook_col = 7 
+        queen_rook_col = 0 
+        if self.is_inverted: 
+            king_starting_col = 3
+            kingside_dir = -1 
+            queenside_dir = 1 
+            king_rook_col = 0 
+            queen_rook_col = 7
 
         if self.board[row][col].name == "king":
-            if col == 6 and row == home: # kingside
-                if self.board[home][7] != 0:
-                    if self.board[home][7].name == "rook":
-                        if self.board[home][7].moved == False: # if rook hasnt' moved
-                            if self.board[home][6].moved == False: # if king hasnt' moved
-                                self.board[home][5] = self.board[home][7]
-                                self.board[home][7] = 0
-                                self.board[home][5].moved = True
+            if col == king_starting_col + (2*kingside_dir) and row == home: # kingside
+                if self.board[home][king_rook_col] != 0:
+                    if self.board[home][king_rook_col].name == "rook":
+                        if self.board[home][king_rook_col].moved == False: # if rook hasnt' moved
+                            if self.board[home][king_starting_col + (2*kingside_dir)].moved == False: # if king hasnt' moved
+                                self.board[home][king_starting_col+kingside_dir] = self.board[home][king_rook_col]
+                                self.board[home][king_rook_col] = 0
+                                self.board[home][king_starting_col+kingside_dir].moved = True
                                 self.board[row][col].castled = True
             
-            if col == 2 and row == home: # queenside
-                if self.board[home][0] != 0:
-                    if self.board[home][0].name == "rook":
-                        if self.board[home][0].moved == False:
-                            if self.board[home][2].moved == False:
-                                self.board[home][3] = self.board[home][0]
-                                self.board[home][0] = 0
-                                self.board[home][3].moved = True
+            if col == king_starting_col +(2*queenside_dir) and row == home: # queenside
+                if self.board[home][queen_rook_col] != 0:
+                    if self.board[home][queen_rook_col].name == "rook":
+                        if self.board[home][queen_rook_col].moved == False:
+                            if self.board[home][king_starting_col + (2*queenside_dir)].moved == False:
+                                self.board[home][king_starting_col+queenside_dir] = self.board[home][queen_rook_col]
+                                self.board[home][queen_rook_col] = 0
+                                self.board[home][king_starting_col+queenside_dir].moved = True
                                 self.board[row][col].castled = True
  
 

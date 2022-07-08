@@ -13,7 +13,7 @@ screen = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT),pygame.RESIZABLE)
 
 
 def main(): 
-    board = Board(screen)
+    board = Board(screen,is_inverted=True)
     running = True;
     while running: 
         pygame.display.update()
@@ -35,11 +35,7 @@ def main():
             
         screen.fill((21, 21, 18))
         board.draw_board()
-        
-
-        
-        
-
+    
 
 main()
    

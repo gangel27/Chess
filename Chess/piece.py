@@ -114,7 +114,7 @@ class Piece:
             self.screen.blit(self.image_black, rect)
       
 class Pawn(Piece): 
-    def __init__(self,screen, colour): 
+    def __init__(self,screen, colour,is_inverted=False): 
         super(Pawn, self).__init__(screen, colour)
         self.image_white = pygame.transform.scale(pygame.image.load(f"./Images/{self.set}/white_pawn.png"), (self.img_width, self.img_height))
         self.image_black = pygame.transform.scale(pygame.image.load(f"./Images/{self.set}/black_pawn.png"), (self.img_width, self.img_height))
@@ -122,6 +122,7 @@ class Pawn(Piece):
         self.name = "pawn"
         self.just_moved_2_squares = False # allows for en passant 
         self.value = 1 
+        self.is_inverted= is_inverted
 
     def legal_moves(self,board, row,col, colour_moving):
     
@@ -134,6 +135,9 @@ class Pawn(Piece):
             moving = -1 # moves up the 2D array 
         else: 
             moving = 1 # moves down the 2D array
+
+        if self.is_inverted: 
+            moving *= -1 
 
         if colour_moving == self.colour:
             # moves 1 forwards
@@ -185,6 +189,9 @@ class Pawn(Piece):
             moving = -1 # moves up the 2D array 
         else: 
             moving = 1 # moves down the 2D array
+        
+        if self.is_inverted: 
+            moving *= -1 
 
         if colour_moving == self.colour:
             # capture right
@@ -473,7 +480,7 @@ class Bishop(Piece):
         return moves
 
 class King(Piece): 
-    def __init__(self,screen, colour): 
+    def __init__(self,screen, colour,is_inverted=False): 
         super(King, self).__init__(screen, colour)
         self.image_white = pygame.transform.scale(pygame.image.load(f"./Images/{self.set}/white_king.png"), (self.img_width, self.img_height))
         self.image_black = pygame.transform.scale(pygame.image.load(f"./Images/{self.set}/black_king.png"), (self.img_width, self.img_height))
@@ -481,13 +488,21 @@ class King(Piece):
         self.moved = False 
         self.value = 10000 # infinite
         self.castled = False
+        self.is_inverted = is_inverted
 
     def legal_moves(self,board, row,col,colour_moving): 
         moves = []
         if colour_moving == "white":
+    
             home = 7
+            if self.is_inverted: 
+                home = 0 
         else: 
             home = 0
+            if self.is_inverted: 
+                home = 7
+        
+
         if colour_moving == self.colour:
             # up 1 
             if row > 0:
@@ -532,24 +547,37 @@ class King(Piece):
         moves = filter_legal_moves_for_check(board,row,col,moves,colour_moving)
         # this is put before castling so that we can check if the king moves through check
 
+        kingside_dir = 1
+        king_starting_col = 4
+        king_rook_col = 7
+        queenside_dir = -1 
+        queen_rook_col = 0
+        if self.is_inverted: 
+            kingside_dir = -1
+            king_starting_col = 3 
+            king_rook_col = 0
+            queenside_dir = 1 
+            queen_rook_col = 7
+
 
         # castling kingside
         if self.moved == False: # king hasn't moved
-            if board[home][7] != 0:
-                if board[home][7].name == "rook":
-                    if board[home][7].moved == False: # rook hasn't moved
-                        if board[home][5] == 0 and board[home][6] == 0:# empty squares in between 
-                            if (home,5) in moves: # makes sure the thing doesn't move thorugh check - already been checked.
-                                moves.append((home,6))
+            if board[home][king_rook_col] != 0:
+                if board[home][king_rook_col].name == "rook":
+                    if board[home][king_rook_col].moved == False: # rook hasn't moved
+                        if board[home][king_starting_col+kingside_dir] == 0 and board[home][king_starting_col+(2*kingside_dir)] == 0:# empty squares in between 
+                            if (home,king_starting_col+kingside_dir) in moves: # makes sure the thing doesn't move thorugh check - already been checked.
+                                moves.append((home,king_starting_col+(2*kingside_dir)))
+
             
         # castling queenside
         if self.moved == False: # king hasn't moved
-            if board[home][0] != 0:
-                if board[home][0].name == "rook":
-                    if board[home][0].moved == False: # if rook hasnt' move 
-                        if board[home][3] == 0 and board[home][2] == 0 and board[home][1] == 0: # empty squares
-                            if (home,3) in moves: # makes sure the thing doesn't move thorugh check - already been checked.
-                                moves.append((home,2))
+            if board[home][queen_rook_col] != 0:
+                if board[home][queen_rook_col].name == "rook":
+                    if board[home][queen_rook_col].moved == False: # if rook hasnt' move 
+                        if board[home][king_starting_col+queenside_dir] == 0 and board[home][king_starting_col+(2*queenside_dir)] == 0 and board[home][king_starting_col+(3*queenside_dir)] == 0: # empty squares
+                            if (home,king_starting_col+queenside_dir) in moves: # makes sure the thing doesn't move thorugh check - already been checked.
+                                moves.append((home,king_starting_col+(2*queenside_dir)))
                              
         if moves == []:
             moves = [(-1,-1)]
