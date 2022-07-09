@@ -149,18 +149,26 @@ class Board:
 
     def draw_pieces(self):
         squares = []
+        
         for i in range(8):
             for j in range(8):
                 square = self.board[i][j]
                 if square != 0:
-                    if square.colour != self.current_colour_moving:
-                        x,y = self.row_col_to_coordinates_conversion(i,j)
-                        x += self.SQUARE_DIMENSION//2
-                        y += self.SQUARE_DIMENSION//2
-                        square.draw(x,y)
-                    else: 
-                        squares.append([i,j])
-        for i,j in squares: 
+                    # if square.colour != self.current_colour_moving:
+                    x,y = self.row_col_to_coordinates_conversion(i,j)
+                    x += self.SQUARE_DIMENSION//2
+                    y += self.SQUARE_DIMENSION//2
+                    square.draw(x,y)
+                    # else: 
+                    #     squares.append([i,j])
+        # for i,j in squares: 
+        #     x,y = self.row_col_to_coordinates_conversion(i,j)
+        #     x += self.SQUARE_DIMENSION//2
+        #     y += self.SQUARE_DIMENSION//2
+        #     self.board[i][j].draw(x,y)
+
+        if (self.selected_moving_square != (-1,-1)):
+            i,j = self.selected_moving_square
             x,y = self.row_col_to_coordinates_conversion(i,j)
             x += self.SQUARE_DIMENSION//2
             y += self.SQUARE_DIMENSION//2
@@ -203,6 +211,7 @@ class Board:
         self.last_move_from = (-1,-1)
         self.last_move_to = (-1,-1)
         self.in_checkmate = False 
+        self.in_stalemate = False
         
         if not self.is_inverted:
 
