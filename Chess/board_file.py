@@ -148,7 +148,7 @@ class Board:
                     pygame.draw.rect(self.screen, self.HIGHLIGHT_COLOUR_LEGAL_MOVE, higlighted_square,self.HIGHLIGHT_THICKNESS_LEGAL_MOVE)
 
     def draw_pieces(self):
-        squares = []
+        # squares = []
         
         for i in range(8):
             for j in range(8):
@@ -269,10 +269,12 @@ class Board:
         # remove legal moves 
         if row != -1 and col != -1:
             if self.selected_moving_square != (-1,-1):
+                self.last_move_to_piece = self.board[row][col] # here 
                 self.board[row][col] = self.board[self.selected_moving_square[0]][self.selected_moving_square[1]]
                 self.board[self.selected_moving_square[0]][self.selected_moving_square[1]] = 0
                 self.last_move_from = self.selected_moving_square
                 self.last_move_to = (row,col)
+               
                 self.legal_moves_for_selected_piece = [(-1,-1)]
                 self.selected_moving_square = (-1,-1)
 
@@ -385,7 +387,7 @@ class Board:
         pass
         if self.last_move_from != (-1,-1) or self.last_move_to != (-1,-1):
             self.board[self.last_move_from[0]][self.last_move_from[1]] = self.board[self.last_move_to[0]][self.last_move_to[1]]
-            self.board[self.last_move_to[0]][self.last_move_to[1]] = 0
+            self.board[self.last_move_to[0]][self.last_move_to[1]] = self.last_move_to_piece
             self.selected_moving_square = (-1,-1)
             self.legal_moves_for_selected_piece = [(-1,-1)]
             self.last_move_from = (-1,-1)
