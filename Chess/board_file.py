@@ -212,6 +212,7 @@ class Board:
         self.last_move_to = (-1,-1)
         self.in_checkmate = False 
         self.in_stalemate = False
+        self.last_move_to_piece = 0
         
         if not self.is_inverted:
 
