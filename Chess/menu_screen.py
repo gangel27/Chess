@@ -13,6 +13,7 @@ class Menu_Screen:
     def __init__(self,screen):
         self.screen = screen
         self.menu_buttons = []
+        self.visible_screen = "Menu_Screen"
         
         self.create_buttons()
 
@@ -25,12 +26,19 @@ class Menu_Screen:
         y = 100 
         width = 300
         height = 50 
-        play_AI_button = Menu_Button(self.screen, x,y,width, height, "Play",RED,GREEN)
+        play_AI_button = Menu_Button(self.screen, x,y,width, height, "Play", "Friend",RED,GREEN)
         
         self.menu_buttons.append(play_AI_button)
+    
+    def process_click(self,x,y):
+        for button in self.menu_buttons: 
+            if button.button_hitbox.collidepoint(x,y): 
+                return button.mode, False # the button that is clicked 
+        return -1, True
+
 
 class Menu_Button: 
-    def __init__(self, screen, x,y,width,height,text, background_colour=WHITE, font_colour=BLACK, hover_colour=None): 
+    def __init__(self, screen, x,y,width,height,text,mode, background_colour=WHITE, font_colour=BLACK, hover_colour=None): 
         self.x = x
         self.y = y 
         self.width = width 
@@ -41,6 +49,8 @@ class Menu_Button:
         self.hover_colour = hover_colour
         self.screen = screen
         self.font = pygame.font.Font('freesansbold.ttf',16)
+        self.mode = mode
+
 
     def draw_button(self): 
         self.button_hitbox = pygame.Rect(self.x, self.y, self.width, self.height)
@@ -48,6 +58,10 @@ class Menu_Button:
 
         self.button_text = self.font.render(self.text, True, self.font_colour)
         self.screen.blit(self.button_text, (self.x, self.y))
+    
+
+
+
 
 
 

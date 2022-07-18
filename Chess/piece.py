@@ -578,7 +578,11 @@ class King(Piece):
                         if board[home][king_starting_col+queenside_dir] == 0 and board[home][king_starting_col+(2*queenside_dir)] == 0 and board[home][king_starting_col+(3*queenside_dir)] == 0: # empty squares
                             if (home,king_starting_col+queenside_dir) in moves: # makes sure the thing doesn't move thorugh check - already been checked.
                                 moves.append((home,king_starting_col+(2*queenside_dir)))
-                             
+          
+
+        # so that you can't castle into check 
+        moves = filter_legal_moves_for_check(board,row,col,moves,colour_moving)
+                        
         if moves == []:
             moves = [(-1,-1)]
         return moves

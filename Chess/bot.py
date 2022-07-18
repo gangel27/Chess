@@ -2,8 +2,8 @@ from random import choice
 from piece import Pawn, Knight, Bishop, King, Queen, Rook, is_in_check,find_king_pos, is_in_checkmate
 import pygame 
 
-def return_all_legal_moves(board, colour="black"): 
-    print('hi')
+def return_all_legal_moves(board, colour="black"):
+    
     valid = []
     for i in range(8):
         for j in range(8):

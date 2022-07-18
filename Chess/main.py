@@ -11,10 +11,11 @@ SCREEN_HEIGHT = 800
 
 screen = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT),pygame.RESIZABLE)
 
+# Menu, AI, Friend, Puzzle, Tutorial
+gamemode = "Menu"
 
-
-def play_game(): 
-    board = Board(screen,is_inverted=True)
+def play_friend(is_inverted): 
+    board = Board(screen,is_inverted=is_inverted)
     running = True;
     while running: 
         pygame.display.update()
@@ -32,13 +33,17 @@ def play_game():
             elif event.type == pygame.KEYDOWN: 
                 if event.key == pygame.K_LEFT: 
                     board.undo_last_move()
+                    
         screen.fill((21, 21, 18))
         board.draw_board()
+       
 
 
-def play_menu_screen():
+def menu_screen():
+    global gamemode
     menu_screen = Menu_Screen(screen)
     running = True 
+
     while running: 
         pygame.display.update()
         for event in pygame.event.get(): 
@@ -46,11 +51,16 @@ def play_menu_screen():
                 running = False
                 pygame.quit()
                 sys.exit()
-            
+        
+            if event.type == pygame.MOUSEBUTTONUP: 
+                x,y = pygame.mouse.get_pos()
+                gamemode, running = menu_screen.process_click(x,y)
+        
         screen.fill((21, 21, 18))
-
         menu_screen.draw_menu_screen()
+        
 
-play_menu_screen()
-play_game()
+menu_screen()
+if gamemode == "Friend": play_friend(is_inverted=True)
+
    
