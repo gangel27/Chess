@@ -263,7 +263,6 @@ class Board:
             self.board[0][6] = Knight(self.screen,"white")
             self.board[0][7] = Rook(self.screen,"white")
 
-
     def move_selected_piece(self,row,col):
         # moves the currently selecting moving piece, to the square taken as a paramter, has already been checked for legality 
         # unhighlight piece. 
@@ -382,7 +381,6 @@ class Board:
                                 self.board[home][queen_rook_col] = 0
                                 self.board[home][king_starting_col+queenside_dir].moved = True
                                 self.board[row][col].castled = True
- 
 
     def undo_last_move(self): 
         pass
