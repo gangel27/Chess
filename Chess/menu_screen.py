@@ -8,9 +8,6 @@ BLACK = (0,0,0)
 GREEN = (0,255,0)
 
 
-
-
-
 class Menu_Screen: 
     def __init__(self,screen):
         self.screen = screen

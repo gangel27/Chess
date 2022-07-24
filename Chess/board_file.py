@@ -9,7 +9,7 @@ from bot import Material_Bot, Search_Tree_bot
 
 
 class Board: 
-    def __init__(self, screen,is_inverted=False): 
+    def __init__(self, screen,is_inverted=False,is_bot_playing=False): 
         self.board = [[0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0],
@@ -79,6 +79,7 @@ class Board:
         self.minmax_bot = Search_Tree_bot()
         self.bot_depth = 3
         self.is_inverted = is_inverted
+        self.is_bot_playing = is_bot_playing
 
         self.screen = screen
         
@@ -122,8 +123,10 @@ class Board:
         self.draw_pieces()
 
         self.draw_if_in_checkmate()   
-        # x = Thread(target=self.simulate_bot())
-        # x.start()  
+        if self.is_bot_playing:
+            self.bot_depth = 1
+            x = Thread(target=self.simulate_bot())
+            x.start()  
     
     def draw_last_move(self):
         if self.last_move_from != (-1,-1) and self.last_move_to != (-1,-1):
@@ -504,6 +507,7 @@ class Board:
     
     def simulate_bot(self):
         pygame.display.update()
+        print(self.current_colour_moving)
         if self.current_colour_moving == "black" and not self.in_checkmate:
             # from_row, from_col, to_row, to_col = return_random_ai_move(self.board, "black")
             move, _ = self.minmax_bot.minimax(self.board, self.bot_depth, False)
@@ -517,23 +521,23 @@ class Board:
             print(f"Suggested move: ({self.board[from_row][from_col]}) --> ({to_row},{to_col})")
             # print(_)
 
-            # self.selected_moving_square = (from_row,from_col)
-            # self.move_selected_piece(to_row,to_col)
-            # if is_in_check(self.board, self.current_colour_moving):
-            #     self.check_pos = find_king_pos(self.board, self.current_colour_moving)
-            #     self.currently_in_check = True 
-            #     self.in_checkmate = is_in_checkmate(self.board, self.current_colour_moving)
-            # else:
-            #     self.currently_in_check = False
-            #     self.check_pos = (-1,-1)
+            self.selected_moving_square = (from_row,from_col)
+            self.move_selected_piece(to_row,to_col)
+            if is_in_check(self.board, self.current_colour_moving):
+                self.check_pos = find_king_pos(self.board, self.current_colour_moving)
+                self.currently_in_check = True 
+                self.in_checkmate = is_in_checkmate(self.board, self.current_colour_moving)
+            else:
+                self.currently_in_check = False
+                self.check_pos = (-1,-1)
 
 
 
-            # self.selected_moving_square = (-1,-1)
-            # sself.legal_moves_for_selected_piece = [(-1,-1)]
+            self.selected_moving_square = (-1,-1)
+            self.legal_moves_for_selected_piece = [(-1,-1)]
             
-            # self.currently_in_check = False
-            # self.currently_in_check = is_in_check(self.board, self.current_colour_moving)
+            self.currently_in_check = False
+            self.currently_in_check = is_in_check(self.board, self.current_colour_moving)
     
 
 
