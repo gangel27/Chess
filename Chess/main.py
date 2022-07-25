@@ -45,6 +45,41 @@ def play_friend(is_inverted,is_bot_playing):
         board.draw_board()
         
         check_navigation_button_click("hover", pygame.mouse.get_pos())
+
+def options_screen():
+    running = True 
+    while running: 
+        pygame.display.update()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT: 
+                running = False 
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONUP: 
+                x,y = pygame.mouse.get_pos()
+                check_navigation_button_click("click",(x,y))
+
+        screen.fill((21,21,18))
+        draw_back_to_main_menu_button(screen, 25,25)
+
+def play_puzzles():
+    running = True 
+    while running: 
+        pygame.display.update()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT: 
+                running = False 
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONUP: 
+                x,y = pygame.mouse.get_pos()
+                check_navigation_button_click("click",(x,y))
+
+        screen.fill((21,21,18))
+        draw_back_to_main_menu_button(screen, 25,25)
+
+
+            
         
        
 
@@ -98,8 +133,8 @@ def check_navigation_button_click(click_type, pos):
 def switch_gamemode():
     if gamemode == "Friend": play_friend(is_inverted=True,is_bot_playing=False)
     if gamemode == "AI": play_friend(is_inverted=False,is_bot_playing=True)
-    if gamemode == "Options": play_friend(is_inverted=True)
-    if gamemode == "Puzzle": play_friend(is_inverted= False)
+    if gamemode == "Options": options_screen()
+    if gamemode == "Puzzle": play_puzzles()
     if gamemode == "Menu": menu_screen()
 
 menu_screen() 
