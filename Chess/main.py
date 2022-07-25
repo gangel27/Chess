@@ -41,8 +41,9 @@ def play_friend(is_inverted,is_bot_playing):
                     board.undo_last_move()
                     
         screen.fill((21, 21, 18))
-        board.draw_board()
         draw_back_to_main_menu_button(screen,25,25)
+        board.draw_board()
+        
         check_navigation_button_click("hover", pygame.mouse.get_pos())
         
        
@@ -87,7 +88,6 @@ def check_navigation_button_click(click_type, pos):
         if button_rect.collidepoint(pos):
             if click_type == "click":
                 if button_type == "return_menu":
-                    
                     gamemode = "Menu"
                     switch_gamemode()
             elif click_type == "hover": 
