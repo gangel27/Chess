@@ -395,7 +395,15 @@ class Board:
             self.last_move_from = (-1,-1)
             self.last_move_to = (-1,-1)
             self.alternate_move_color() # reverts move colour back
-
+    
+    def clear_board(self): 
+        for i in range(8):
+            for j in range(8): 
+                self.board[i][j] = 0 
+    
+    def convert_modified_fen_to_board(pos,move):
+        # pos: rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1
+        pass
 
     def alternate_move_color(self):
         if self.current_colour_moving == "white":
