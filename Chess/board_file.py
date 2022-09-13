@@ -317,8 +317,8 @@ class Board:
         if row == en_passant_to_rank:
             if self.last_move_from[0] == en_passant_from_rank:
                 if abs(col-self.last_move_from[1]) == 1: # moved one column over
-
-                    self.board[row+moving][col] = 0
+                    if self.board[row][col].name == "pawn":
+                        self.board[row+moving][col] = 0
 
     def set_pawns_just_moved_2_squares_false(self):
         for i in range(8):

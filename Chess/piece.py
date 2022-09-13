@@ -127,7 +127,7 @@ class Pawn(Piece):
     def legal_moves(self,board, row,col, colour_moving):
     
         # 2 forwards, 1 forwards, caputre left, caputre right
-        # to do: en passant, promotion.
+
         
         
         moves = [] 
@@ -167,6 +167,7 @@ class Pawn(Piece):
                 if board[row][col-1] != 0:
                     if board[row][col-1].name == "pawn":
                         if board[row][col-1].just_moved_2_squares:
+                            
                             moves.append((row+moving,col-1))
 
             # en passant right
