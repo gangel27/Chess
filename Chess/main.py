@@ -3,7 +3,7 @@ import pygame,sys
 from bot import Search_Tree_bot
 from threading import Thread
 
-from button import Menu_Button, Selection_Field
+from button import Menu_Button, Selection_Field, Icon_Button
 
 pygame.init()
 
@@ -14,7 +14,7 @@ BLACK = (0,0,0)
 
 screen = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT),pygame.RESIZABLE)
 menu_background_image = pygame.transform.scale(pygame.image.load(f"./Images/Backgrounds/chess_pieces.jpg"), (SCREEN_WIDTH, SCREEN_HEIGHT))
-
+wooden_background_image = pygame.transform.scale(pygame.image.load(f"./Images/Backgrounds/wooden.jpg"), (SCREEN_WIDTH, SCREEN_HEIGHT))
 # main menu 
 # tutorial game
 # quit 
@@ -43,8 +43,11 @@ def central_main():
 def play_friend_game(is_inverted=False,is_bot_playing=False): 
     
     board = Board(screen,is_inverted=is_inverted,is_bot_playing=is_bot_playing)
+
+    return_button = Icon_Button("back_arrow.png", 100,100,50,50, "general_play_menu")
+
     
-    running = True;
+    running = True
     while running: 
         pygame.display.update()
         for event in pygame.event.get(): 
@@ -58,13 +61,18 @@ def play_friend_game(is_inverted=False,is_bot_playing=False):
             elif event.type == pygame.MOUSEBUTTONUP: 
                 x,y = pygame.mouse.get_pos()
                 board.process_square_click(x,y,"up")
+                
+                is_clicked, identifier = return_button.check_is_clicked(x,y)
+                if is_clicked: 
+                    return identifier
 
             elif event.type == pygame.KEYDOWN: 
                 if event.key == pygame.K_LEFT: 
                     board.undo_last_move()
                     
-        screen.fill((21, 21, 18))
+        screen.blit(wooden_background_image, (0,0))
         board.draw_board()
+        return_button.draw(screen)
 
 def main_menu_screen(): # 630x645 to work with form 0,0
     running = True
@@ -131,11 +139,12 @@ def general_play_menu():
     title_font_img = title_font.render(title_text, True, title_text_colour)
     adjust_x = -int(title_font_img.get_rect().width//2)
     adjust_y = -int(title_font_img.get_rect().height//2)
+    
     play_computer_button = Menu_Button(button_x,button_start_y, "Play the Computer", "pre_vs_computer_settings",font_size)
     play_friend_button = Menu_Button(button_x, button_start_y + (button_spacing), "Play with a Friend ", "play_friend_game", font_size)
     play_puzzles_button = Menu_Button(button_x, button_start_y +(button_spacing*2), "Play Puzzles", "play_puzzles_game", font_size)
     return_to_main_menu_button = Menu_Button(button_x, button_start_y +(button_spacing*3), "Return", "main_menu", font_size)
-    title_font = pygame.font.Font(title_font_style, title_font_size)
+    
 
     buttons = [play_computer_button, play_friend_button, play_puzzles_button, return_to_main_menu_button]
     while running: 
@@ -170,6 +179,7 @@ def quit_game_screen():
 
 def play_vs_computer(is_inverted=False):
     board = Board(screen,is_inverted,True)
+    return_button = Icon_Button("back_arrow.png", 100,100,50,50, "general_play_menu")
     
     running = True;
     while running: 
@@ -185,6 +195,9 @@ def play_vs_computer(is_inverted=False):
             elif event.type == pygame.MOUSEBUTTONUP: 
                 x,y = pygame.mouse.get_pos()
                 board.process_square_click(x,y,"up")
+                is_clicked, identifier = return_button.check_is_clicked(x,y)
+                if is_clicked: 
+                    return identifier
 
             elif event.type == pygame.KEYDOWN: 
                 if event.key == pygame.K_LEFT: 
@@ -192,6 +205,7 @@ def play_vs_computer(is_inverted=False):
                     
         screen.fill((21, 21, 18))
         board.draw_board()
+        return_button.draw(screen)
 
 def in_game_settings():
     pass
@@ -201,11 +215,28 @@ def play_puzzles_game():
 
 def pre_vs_computer_settings(): 
     running = True 
-    ai_brain_power = Selection_Field("Depth", ["1", "2", "3"], 30, 200)
-    ai_evaluation = Selection_Field("Evaluation Strength", ["1", "2", "3"], 30, 300)
-    play_vs_computer_button = Menu_Button(325, 500, "Play Game", "play_computer_game", 30)
+
+    ai_brain_power = Selection_Field("Depth", ["1", "2", "3"], 30, 250)
+    ai_evaluation = Selection_Field("Evaluation Strength", ["1", "2", "3"], 30, 325)
+    play_vs_computer_button = Menu_Button(325, 550, "Play Game", "play_computer_game", 30)
     return_button = Menu_Button(325, 600, "Return", "general_play_menu", 30)
     buttons = [play_vs_computer_button, return_button]
+    fields = [ai_brain_power, ai_evaluation]
+
+
+    title_font_style = "freesansbold.ttf"
+    title_font_size = 100
+    title_text = "AI settings"
+    title_text_colour = BLACK
+    title_font_x = 315
+    title_font_y = 100
+
+    title_font = pygame.font.Font(title_font_style, title_font_size)
+    title_font_img = title_font.render(title_text, True, title_text_colour)
+    adjust_x = -int(title_font_img.get_rect().width//2)
+    adjust_y = -int(title_font_img.get_rect().height//2)
+
+
     while running: 
         pygame.display.update()
         for event in pygame.event.get(): 
@@ -221,12 +252,17 @@ def pre_vs_computer_settings():
                     is_clicked, identifier = button.check_is_clicked(x,y)
                     if is_clicked: 
                         return identifier
+                
+                for field in fields: 
+                    field.check_is_clicked(x,y)
+                
                     
         screen.blit(menu_background_image,(0,0))
         ai_brain_power.draw(screen)
         ai_evaluation.draw(screen)
         play_vs_computer_button.draw(screen)
         return_button.draw(screen)
+        screen.blit(title_font_img, (title_font_x + adjust_x, title_font_y + adjust_y))
         
  
 

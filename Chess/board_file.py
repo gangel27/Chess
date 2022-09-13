@@ -43,7 +43,7 @@ class Board:
         LICHESS_COLD_MOVE_TO = (152,176,127)
 
         self.TOP_MARGIN = 100
-        self.LEFT_MARGIN = 100
+        self.LEFT_MARGIN = 300
         self.SQUARE_DIMENSION = 75
         self.SQUARE_COLOUR_1 = LICHESS_WHITE
         self.SQUARE_COLOUR_2 = LICHESS_BROWN
@@ -102,6 +102,8 @@ class Board:
                 pygame.draw.rect(self.screen, colour, square)
                 colour = self.switch_square_colour(colour)
             colour = self.switch_square_colour(colour)
+    
+    
 
     def draw_if_in_check(self):
         if self.currently_in_check: 
@@ -125,8 +127,8 @@ class Board:
         self.draw_if_in_checkmate()   
         if self.is_bot_playing:
             self.bot_depth = 1
-            x = Thread(target=self.simulate_bot())
-            x.start()  
+            self.simulate_bot()
+             
     
     def draw_last_move(self):
         if self.last_move_from != (-1,-1) and self.last_move_to != (-1,-1):
@@ -514,8 +516,7 @@ class Board:
         return (row,col, error )
     
     def simulate_bot(self):
-        pygame.display.update()
-        print(self.current_colour_moving)
+        
         if self.current_colour_moving == "black" and not self.in_checkmate:
             # from_row, from_col, to_row, to_col = return_random_ai_move(self.board, "black")
             move, _ = self.minmax_bot.minimax(self.board, self.bot_depth, False)

@@ -101,10 +101,36 @@ class Selection_Field:
                 self.options_text_imgs[counter] = self.options_font.render(self.options[counter], True, self.options_font_colour)
             screen.blit(self.options_text_imgs[counter], (self.startx + (counter+1)*self.gap_x + self.initial_gap_x, self.y))
             counter += 1
-
-
-
         
+    def check_is_clicked(self, x, y): 
+        counter = 0 
+        for hitbox in self.option_text_hitboxes: 
+            if hitbox.collidepoint((x,y)): 
+                self.index_selected = counter
+                return
+            
+            counter += 1 
+
+
+class Icon_Button: 
+    def __init__(self, img, x,y, width,height, identifier): 
+        
+        self.width = width 
+        self.height = height
+        self.x = x - self.width//2
+        self.y = y - self.height//2
+        self.img = pygame.transform.scale(pygame.image.load(f"./Images/Icons/{img}"), (self.width, self.height))
+        self.identifier = identifier
+        self.img_hitbox = pygame.Rect(self.x,self.y,self.width, self.height)
+
+    def draw(self, screen): 
+        screen.blit(self.img, (self.x, self.y))
+    
+    def check_is_clicked(self,x,y): 
+        if self.img_hitbox.collidepoint((x,y)): 
+            return True, self.identifier
+        return False, ""
+
 
 
 
