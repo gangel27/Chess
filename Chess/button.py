@@ -2,9 +2,10 @@ from tkinter import E
 import pygame
 
 pygame.font.init()
-GREEN = (0,200,0)
+GREEN = (0,200,0,0.75)
 WHITE = (200,200,200,0.25)
 BLACK = (10,10,10,0.95)
+GREY = "#7b7b7b"
 
 class Menu_Button: 
     def __init__(self,x, y, text, identifier, font_size): 
@@ -18,7 +19,7 @@ class Menu_Button:
         self.font = pygame.font.Font(self.font_style, self.font_size)
         pygame.font.Font.set_underline(self.font, True)
         self.is_hovering = False
-        self.hover_colour = WHITE
+        self.hover_colour = GREY
         self.text_img = self.font.render(self.text, True, self.font_colour)
         self.adjust_x = -int(self.text_img.get_rect().width//2)
         self.adjust_y = -int(self.text_img.get_rect().height//2)
@@ -55,8 +56,8 @@ class Selection_Field:
         self.options = options
         self.startx = startx
         self.y = y 
-        self.options_hover_colour = WHITE
-        self.options_selected_colour = GREEN
+        self.options_hover_colour = GREY
+        self.options_selected_colour = GREY
         self.index_selected = index_selected
  
         self.gap_x = 100 

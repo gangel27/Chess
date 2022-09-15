@@ -2,6 +2,8 @@ from board_file import Board
 import pygame,sys
 from bot import Search_Tree_bot
 from threading import Thread
+import json 
+
 
 from button import Menu_Button, Selection_Field, Icon_Button
 
@@ -11,6 +13,9 @@ SCREEN_WIDTH =  1200
 SCREEN_HEIGHT = 800
 WHITE = (255,255,255)
 BLACK = (0,0,0)
+GREEN = (0,200,0,0.75)
+GREY = "#7b7b7b"
+BURGANDY = "#66001a"
 
 screen = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT),pygame.RESIZABLE)
 menu_background_image = pygame.transform.scale(pygame.image.load(f"./Images/Backgrounds/chess_pieces.jpg"), (SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -44,7 +49,7 @@ def play_friend_game(is_inverted=False,is_bot_playing=False):
     
     board = Board(screen,is_inverted=is_inverted,is_bot_playing=is_bot_playing)
 
-    return_button = Icon_Button("back_arrow.png", 100,100,50,50, "general_play_menu")
+    return_button = Icon_Button("back_arrow.png", 50,50,100,100, "general_play_menu")
 
     
     running = True
@@ -81,22 +86,25 @@ def main_menu_screen(): # 630x645 to work with form 0,0
     button_x = 315
     button_start_y = 350
     title_font_style = "main_font.ttf"
-    import os
-    print(os.getcwd())
+
     title_font_size = 120
-    title_text = "Chess Lite"
+    title_text = "Chess"
     title_text_colour = BLACK
-    title_font_x = 315
+    title_font_x = 200
     title_font_y = 200
+    title_text_2 = "Lite"
+    title_text_2_colour = BLACK
+    title_2_x_adjust = 360
 
     title_font = pygame.font.Font("main_font.ttf", title_font_size)
     title_font_img = title_font.render(title_text, True, title_text_colour)
+    title_font_img_2 = title_font.render(title_text_2, True, title_text_2_colour)
     adjust_x = -int(title_font_img.get_rect().width//2)
     adjust_y = -int(title_font_img.get_rect().height//2)
     play_button = Menu_Button(button_x,button_start_y, "Play", "general_play_menu",font_size)
     how_to_play_button = Menu_Button(button_x, button_start_y + (button_spacing), "How to play", "tutorial_game", font_size)
     quit_button = Menu_Button(button_x, button_start_y +(button_spacing*2), "Quit", "quit", font_size)
-    title_font = pygame.font.Font(title_font_style, title_font_size)
+    
 
     buttons = [play_button, how_to_play_button, quit_button]
     while running: 
@@ -121,6 +129,7 @@ def main_menu_screen(): # 630x645 to work with form 0,0
         for button in buttons:
             button.draw(screen)
         screen.blit(title_font_img, (title_font_x + adjust_x, title_font_y + adjust_y))
+        screen.blit(title_font_img_2, (title_font_x +adjust_x + title_2_x_adjust, title_font_y + adjust_y))
         
 def general_play_menu(): 
     running = True
@@ -179,7 +188,8 @@ def quit_game_screen():
 
 def play_vs_computer(is_inverted=False):
     board = Board(screen,is_inverted,True)
-    return_button = Icon_Button("back_arrow.png", 100,100,50,50, "general_play_menu")
+    return_button = Icon_Button("back_arrow.png", 50,50,100,100, "general_play_menu")
+    
     
     running = True;
     while running: 
@@ -203,7 +213,7 @@ def play_vs_computer(is_inverted=False):
                 if event.key == pygame.K_LEFT: 
                     board.undo_last_move()
                     
-        screen.fill((21, 21, 18))
+        screen.blit(wooden_background_image, (0,0))
         board.draw_board()
         return_button.draw(screen)
 
@@ -216,12 +226,16 @@ def play_puzzles_game():
 def pre_vs_computer_settings(): 
     running = True 
 
-    ai_brain_power = Selection_Field("Depth", ["1", "2", "3"], 30, 250)
-    ai_evaluation = Selection_Field("Evaluation Strength", ["1", "2", "3"], 30, 325)
-    play_vs_computer_button = Menu_Button(325, 550, "Play Game", "play_computer_game", 30)
-    return_button = Menu_Button(325, 600, "Return", "general_play_menu", 30)
-    buttons = [play_vs_computer_button, return_button]
-    fields = [ai_brain_power, ai_evaluation]
+    with open("settings.json") as json_file: 
+        json_data = json.load(json_file)
+        
+
+        ai_brain_power = Selection_Field("Depth", ["1", "2", "3"], 30, 250, json_data['AI-Depth']-1)
+        ai_evaluation = Selection_Field("Evaluation Strength", ["1", "2", "3"], 30, 325, json_data['AI-Evaluation-Strength']-1)
+        play_vs_computer_button = Menu_Button(325, 550, "Play Game", "play_computer_game", 30)
+        return_button = Menu_Button(325, 600, "Return", "general_play_menu", 30)
+        buttons = [play_vs_computer_button, return_button]
+        fields = [ai_brain_power, ai_evaluation]
 
 
     title_font_style = "freesansbold.ttf"
@@ -250,7 +264,12 @@ def pre_vs_computer_settings():
                 x,y = pygame.mouse.get_pos()
                 for button in buttons:
                     is_clicked, identifier = button.check_is_clicked(x,y)
-                    if is_clicked: 
+                    if is_clicked:
+                        with open("settings.json", "w") as json_file: 
+                            json_data["AI-Depth"] = ai_brain_power.index_selected + 1
+                            json_data["AI-Evaluation-Strength"] = ai_evaluation.index_selected + 1
+                            json.dump(json_data, json_file)
+
                         return identifier
                 
                 for field in fields: 
