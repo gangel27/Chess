@@ -10,7 +10,7 @@ from bot import Material_Bot, Search_Tree_bot
 
 
 class Board: 
-    def __init__(self, screen,is_inverted=False,is_bot_playing=False, ai_depth=0, ai_evaluatoin_level=0): 
+    def __init__(self, screen,is_inverted=False,is_bot_playing=False, ai_depth=0, ai_evaluatoin_level=0, user_colour="white"): 
         self.board = [[0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0],
@@ -83,6 +83,7 @@ class Board:
         self.is_bot_playing = is_bot_playing
         self.ai_depth = ai_depth 
         self.ai_eval_level = ai_evaluatoin_level
+        self.user_colour = user_colour
         
         self.thread_make_ai_think = self.return_new_ai_thread()
         self.screen = screen
@@ -143,9 +144,6 @@ class Board:
             x,y = self.row_col_to_coordinates_conversion(self.last_move_to[0],self.last_move_to[1])
             to_square = pygame.Rect(x,y,self.SQUARE_DIMENSION,self.SQUARE_DIMENSION)
             pygame.draw.rect(self.screen, self.HIGHLIGHT_COLOUR_LAST_MOVE_TO, to_square)
-
-            
-
 
 
     def draw_highlighted_legal_moves(self):
@@ -443,21 +441,11 @@ class Board:
             assuming click is in the board area, draw a rectangle around the box of click. 
             check the selected_Moving_square, and call the find legal moves for specific piece. 
         '''
-        # row,col = coordinates_to_row_col_conversion(x,y)
-        # if 0<=row<=7 and 0<=col<=7:
-            # moved = false 
-            # for legal move in piece_legal_moves
-                # if legal move == row, col:
-                    # move_selected_piece(row,col)
-                    # moved = true 
-
-            # if not moved: 
-                # self.selected_moving_square = (row,col)
-                # find_legal_moves_for_piece(row,col)
+        
         is_processed = False 
         row,col,error = self.coordinates_to_row_col_conversion(x,y)
 
-        if not is_processed:  # moves a piece
+        if not is_processed:  # moves an already selected piece
             for legal_move in self.legal_moves_for_selected_piece:
                 if (row,col) == legal_move:
 
@@ -490,8 +478,6 @@ class Board:
                     self.board[self.selected_moving_square[0]][self.selected_moving_square[1]].follow_mouse = False 
                     self.selected_moving_square = (-1,-1)
                     self.legal_moves_for_selected_piece = [(-1,-1)]
-                
-
 
         if not is_processed: # highlights a square also want the piece to follow the mouse 
             if not error: 
@@ -499,6 +485,10 @@ class Board:
                     self.selected_moving_square = (row,col)
                     if self.board[row][col] != 0:
                         self.legal_moves_for_selected_piece = self.board[row][col].legal_moves(self.board, row,col, self.current_colour_moving)
+                        if self.is_bot_playing: 
+                            if self.board[row][col].colour != self.user_colour: 
+                                self.legal_moves_for_selected_piece = [(-1,-1)]
+                                
                         if click_type == "down":
                             if self.board[row][col].colour == self.current_colour_moving:
                                 self.board[row][col].follow_mouse = True 
@@ -507,6 +497,8 @@ class Board:
             else: # clicked outside the range of the board
                 self.selected_moving_square = (-1,-1)
                 self.legal_moves_for_selected_piece = [(-1,-1)]
+        
+        
 
     def row_col_to_coordinates_conversion(self,row,col):
         x = self.LEFT_MARGIN + (col * self.SQUARE_DIMENSION)
