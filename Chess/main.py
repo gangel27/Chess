@@ -187,8 +187,11 @@ def quit_game_screen():
     sys.exit()
 
 def play_vs_computer(is_inverted=False):
-    board = Board(screen,is_inverted,True)
-    return_button = Icon_Button("back_arrow.png", 50,50,100,100, "general_play_menu")
+    with open("settings.json") as json_file: 
+        data = json.load(json_file)
+        
+        board = Board(screen,is_inverted,True, data['AI-Depth'], data['AI-Evaluation-Strength'])
+        return_button = Icon_Button("back_arrow.png", 50,50,100,100, "general_play_menu")
     
     
     running = True;

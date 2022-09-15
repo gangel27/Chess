@@ -1,15 +1,16 @@
 
 from piece import Pawn, Knight, Bishop, King, Queen, Rook, is_in_check,find_king_pos,is_in_checkmate
 import pygame 
-from threading import Thread
+import threading
 from time import sleep 
 from bot import Material_Bot, Search_Tree_bot
 
 
 
 
+
 class Board: 
-    def __init__(self, screen,is_inverted=False,is_bot_playing=False): 
+    def __init__(self, screen,is_inverted=False,is_bot_playing=False, ai_depth=0, ai_evaluatoin_level=0): 
         self.board = [[0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0],
@@ -80,7 +81,10 @@ class Board:
         self.bot_depth = 3
         self.is_inverted = is_inverted
         self.is_bot_playing = is_bot_playing
-
+        self.ai_depth = ai_depth 
+        self.ai_eval_level = ai_evaluatoin_level
+        
+        self.thread_make_ai_think = self.return_new_ai_thread()
         self.screen = screen
         
         self.reset_board();
@@ -125,9 +129,9 @@ class Board:
         self.draw_pieces()
 
         self.draw_if_in_checkmate()   
-        if self.is_bot_playing:
-            self.bot_depth = 1
-            self.simulate_bot()
+
+
+        
              
     
     def draw_last_move(self):
@@ -139,6 +143,10 @@ class Board:
             x,y = self.row_col_to_coordinates_conversion(self.last_move_to[0],self.last_move_to[1])
             to_square = pygame.Rect(x,y,self.SQUARE_DIMENSION,self.SQUARE_DIMENSION)
             pygame.draw.rect(self.screen, self.HIGHLIGHT_COLOUR_LAST_MOVE_TO, to_square)
+
+            
+
+
 
     def draw_highlighted_legal_moves(self):
         if self.legal_moves_for_selected_piece[0] != (-1,-1):
@@ -172,15 +180,16 @@ class Board:
         #     y += self.SQUARE_DIMENSION//2
         #     self.board[i][j].draw(x,y)
 
+        
+
         if (self.selected_moving_square != (-1,-1)):
             i,j = self.selected_moving_square
             x,y = self.row_col_to_coordinates_conversion(i,j)
             x += self.SQUARE_DIMENSION//2
             y += self.SQUARE_DIMENSION//2
             self.board[i][j].draw(x,y)
-
-
-
+        
+        
     def draw_highlighted_selected_square(self):
         if self.selected_moving_square != (-1,-1):
             x,y = self.row_col_to_coordinates_conversion(self.selected_moving_square[0], self.selected_moving_square[1])
@@ -296,6 +305,11 @@ class Board:
                     squares_moved = abs(self.last_move_from[0]- self.last_move_to[0])
                     if squares_moved == 2:
                         self.board[row][col].just_moved_2_squares = True
+        if self.is_bot_playing: 
+            self.thread_make_ai_think = self.return_new_ai_thread().start()
+    
+    def return_new_ai_thread(self): 
+        return threading.Thread(target=self.simulate_bot,daemon=False)
     
     def check_if_en_passant(self,row,col):
         if self.current_colour_moving == "white":
@@ -519,15 +533,15 @@ class Board:
         
         if self.current_colour_moving == "black" and not self.in_checkmate:
             # from_row, from_col, to_row, to_col = return_random_ai_move(self.board, "black")
-            move, _ = self.minmax_bot.minimax(self.board, self.bot_depth, False)
+            move, _ = self.minmax_bot.minimax(self.board, self.ai_depth, False, self.ai_eval_level)
             from_row = move[0]
             from_col = move[1]
             to_row = move[2]
             to_col = move[3]
             
             # from_row,from_col,to_row,to_col = 1,2,3,2
-            print(from_row, from_col, to_row, to_col)
-            print(f"Suggested move: ({self.board[from_row][from_col]}) --> ({to_row},{to_col})")
+            # print(from_row, from_col, to_row, to_col)
+            # print(f"Suggested move: ({self.board[from_row][from_col]}) --> ({to_row},{to_col})")
             # print(_)
 
             self.selected_moving_square = (from_row,from_col)

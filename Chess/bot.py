@@ -159,8 +159,9 @@ class Search_Tree_bot:
 
 
     
-    def minimax(self,board, depth, maximising_player):
+    def minimax(self,board, depth, maximising_player, eval_strength):
         if depth == 0 or is_in_checkmate(board, "white") or is_in_checkmate(board, "black"): # base case 
+            # this is where i can change what the eval_strength is... when im ready ofc
             return None, self.return_position_value(board)
         
         
@@ -174,7 +175,7 @@ class Search_Tree_bot:
             for move in whites_moves: 
                 editing_board = list(map(list, board))
                 editing_board = make_move(editing_board, move[0], move[1], move[2], move[3])
-                _, eval = self.minimax(editing_board, depth-1, False)
+                _, eval = self.minimax(editing_board, depth-1, False, eval_strength)
                 if eval > max_eval: 
                     max_eval = eval 
                     best_move = move
@@ -195,7 +196,7 @@ class Search_Tree_bot:
             for move in black_moves: 
                 editing_board = list(map(list, board))
                 editing_board = make_move(editing_board, move[0], move[1], move[2], move[3])
-                _, eval = self.minimax(editing_board,depth-1, True)
+                _, eval = self.minimax(editing_board,depth-1, True, eval_strength)
                 if eval < min_eval: 
                     min_eval = eval 
                     best_move = move

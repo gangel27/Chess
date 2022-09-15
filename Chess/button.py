@@ -87,6 +87,7 @@ class Selection_Field:
             img = self.options_font.render(option, True, self.options_font_colour)
             self.options_text_imgs.append(img)
 
+    
         
     def draw(self, screen): 
         screen.blit(self.title_text_img, (self.startx, self.y))
