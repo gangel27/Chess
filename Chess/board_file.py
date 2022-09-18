@@ -1,12 +1,10 @@
 
+from unittest import skip
 from piece import Pawn, Knight, Bishop, King, Queen, Rook, is_in_check,find_king_pos,is_in_checkmate
 import pygame 
 import threading
 from time import sleep 
 from bot import Material_Bot, Search_Tree_bot
-
-
-
 
 
 class Board: 
@@ -87,7 +85,7 @@ class Board:
         
         self.thread_make_ai_think = self.return_new_ai_thread()
         self.screen = screen
-        
+        self.ints = ["0","1", "2", "3", "4", "5", "6", "7", "8", "9"]
         self.reset_board();
 
     def switch_square_colour(self,colour):
@@ -107,8 +105,6 @@ class Board:
                 pygame.draw.rect(self.screen, colour, square)
                 colour = self.switch_square_colour(colour)
             colour = self.switch_square_colour(colour)
-    
-    
 
     def draw_if_in_check(self):
         if self.currently_in_check: 
@@ -130,10 +126,6 @@ class Board:
         self.draw_pieces()
 
         self.draw_if_in_checkmate()   
-
-
-        
-             
     
     def draw_last_move(self):
         if self.last_move_from != (-1,-1) and self.last_move_to != (-1,-1):
@@ -144,7 +136,6 @@ class Board:
             x,y = self.row_col_to_coordinates_conversion(self.last_move_to[0],self.last_move_to[1])
             to_square = pygame.Rect(x,y,self.SQUARE_DIMENSION,self.SQUARE_DIMENSION)
             pygame.draw.rect(self.screen, self.HIGHLIGHT_COLOUR_LAST_MOVE_TO, to_square)
-
 
     def draw_highlighted_legal_moves(self):
         if self.legal_moves_for_selected_piece[0] != (-1,-1):
@@ -187,7 +178,40 @@ class Board:
             y += self.SQUARE_DIMENSION//2
             self.board[i][j].draw(x,y)
         
+    def fen_to_board(self, fen, colour_moving): 
         
+        self.board = []
+        
+        for row in fen.split('/'):
+            brow = []
+            for c in row:
+                if c == ' ':
+                    break
+                elif c in '12345678':
+                    brow.extend( [0] * int(c) )
+                elif c == 'P': brow.append(Pawn(self.screen, "white"))
+                elif c == 'p': brow.append(Pawn(self.screen, "black"))
+                elif c == "R": brow.append(Rook(self.screen, "white"))
+                elif c == "r": brow.append(Rook(self.screen, "black"))
+                elif c == "B": brow.append(Bishop(self.screen, "white"))
+                elif c == "b": brow.append(Bishop(self.screen, "black"))
+                elif c == "Q": brow.append(Queen(self.screen, "white"))
+                elif c == "q": brow.append(Queen(self.screen, "black"))
+                elif c == "K": brow.append(King(self.screen, "white"))
+                elif c == "k": brow.append(King(self.screen, "black"))
+                elif c == "N": brow.append(Knight(self.screen, "white"))
+                elif c == "n": brow.append(Knight(self.screen, "black"))
+      
+                
+            self.board.append(brow)
+        self.current_colour_moving = colour_moving
+        self.board.remove([])
+
+    def flip_fen_position(self, fen): 
+        fen_rows = fen.split("/")
+        string = f"{fen_rows[7][::-1]}/{fen_rows[6][::-1]}/{fen_rows[5][::-1]}/{fen_rows[4][::-1]}/{fen_rows[3][::-1]}/{fen_rows[2][::-1]}/{fen_rows[1][::-1]}/{fen_rows[0][::-1]}/"
+        return string 
+
     def draw_highlighted_selected_square(self):
         if self.selected_moving_square != (-1,-1):
             x,y = self.row_col_to_coordinates_conversion(self.selected_moving_square[0], self.selected_moving_square[1])
@@ -196,12 +220,13 @@ class Board:
 
     def blit_checkmate(self):
         self.screen.blit(self.CHECKMATE_TEXT, self.CHECKMATE_BOX)
-        sleep(1)
-        self.reset_board()
+
+        t = threading.Timer(3.0, self.reset_board)
+        t.start()
 
     def draw_if_in_checkmate(self):
         if self.in_checkmate:
-            x = Thread(target=self.blit_checkmate)
+            x = threading.Thread(target=self.blit_checkmate)
             x.start()
             
     def reset_board(self):
@@ -488,7 +513,7 @@ class Board:
                         if self.is_bot_playing: 
                             if self.board[row][col].colour != self.user_colour: 
                                 self.legal_moves_for_selected_piece = [(-1,-1)]
-                                
+
                         if click_type == "down":
                             if self.board[row][col].colour == self.current_colour_moving:
                                 self.board[row][col].follow_mouse = True 
@@ -497,8 +522,6 @@ class Board:
             else: # clicked outside the range of the board
                 self.selected_moving_square = (-1,-1)
                 self.legal_moves_for_selected_piece = [(-1,-1)]
-        
-        
 
     def row_col_to_coordinates_conversion(self,row,col):
         x = self.LEFT_MARGIN + (col * self.SQUARE_DIMENSION)
@@ -525,7 +548,7 @@ class Board:
         
         if self.current_colour_moving == "black" and not self.in_checkmate:
             # from_row, from_col, to_row, to_col = return_random_ai_move(self.board, "black")
-            move, _ = self.minmax_bot.minimax(self.board, self.ai_depth, False, self.ai_eval_level)
+            move, _ = self.minmax_bot.minimax(self.board, self.ai_depth , False, self.ai_eval_level)
             from_row = move[0]
             from_col = move[1]
             to_row = move[2]

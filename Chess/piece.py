@@ -1,6 +1,8 @@
 import pygame
 
 def is_square_empty(board, row,col,capture,piece_colour):
+    if row >=8 or col >=8: 
+        return False
     if board[row][col] == 0: # if empty 
         return True
     if capture:
@@ -739,7 +741,7 @@ class Rook(Piece):
                 if row + moving > 7:
                     down_limit = True
                     break 
-
+                
                 free = is_square_empty(board,row+moving,col,False,colour_moving)
                 if free: moves.append((row+moving,col))
                 else:

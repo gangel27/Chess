@@ -1,0 +1,11 @@
+{
+    "easy": [
+        { "fen": "r2qrn1k/1pp1b1p1/3p1p2/p3p2p/P1QnP2P/2NPB2b/BPP2PP1/2KR3R", "colour-moving": "black", "solution": "e4" }
+    ],
+    "medium": [
+        { "fen": "8/8/8/4K2p/2P1Q3/5qk1/8/8", "colour-moving": "black", "solution": "e4" }
+    ],
+    "hard": [
+        { "fen": "8/8/8/4K2p/2P1Q3/5qk1/8/8", "colour-moving": "white", "solution": "e4" }
+    ]
+}

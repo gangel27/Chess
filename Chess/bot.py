@@ -30,8 +30,6 @@ def make_move(editing_board, from_row,from_col,to_row,to_col):
     return editing_board 
 
 
-
-
  # adds the total value of position after each move, chooses randomly between the moves that all have the highest value
 class Material_Bot: 
     def return_position_value(self,board, colour="black"): 
@@ -129,33 +127,7 @@ class Search_Tree_bot:
     
     def is_known_position(self,board):
         pass
-        # e4 = [[0 for i in range(8)] for j in range(8)]
-        # for i in range(8): # pawns 
-        #     e4[6][i] =  Pawn(None,"white")
-        #     e4[1][i] =  Pawn(None,"black")
-        
-      
-        # e4[7][0] = Rook(None,"white")
-        # e4[7][1] = Knight(None,"white")
-        # e4[7][2] = Bishop(None,"white")
-        # e4[7][3] = Queen(None,"white")
-        # e4[7][4] = King(None,"white")
-        # e4[7][5] = Bishop(None,"white")
-        # e4[7][6] = Knight(None,"white")
-        # e4[7][7] = Rook(None,"white")
-
-        # e4[0][0] = Rook(None,"black")
-        # e4[0][1] = Knight(None,"black")
-        # e4[0][2] = Bishop(None,"black")
-        # e4[0][3] = Queen(None,"black")
-        # e4[0][4] = King(None,"black")
-        # e4[0][5] = Bishop(None,"black")
-        # e4[0][6] = Knight(None,"black")
-        # e4[0][7] = Rook(None,"black")
-        # e4 = make_move(e4, 6,4,4,4)
-        # e4 = make_move(e4, 1,4,3,4)
-        # if board == e4: 
-        #     return True
+  
 
 
     
@@ -164,9 +136,7 @@ class Search_Tree_bot:
             # this is where i can change what the eval_strength is... when im ready ofc
             return None, self.return_position_value(board)
         
-        
-
-        
+    
         
         if maximising_player: # for white moving 
             max_eval = -1000000

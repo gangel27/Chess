@@ -19,7 +19,8 @@ class Menu_Button:
         self.font = pygame.font.Font(self.font_style, self.font_size)
         pygame.font.Font.set_underline(self.font, True)
         self.is_hovering = False
-        self.hover_colour = GREY
+        self.hover_colour = "#D3D3D3"
+        self.hover_colour = "#ffffff"
         self.text_img = self.font.render(self.text, True, self.font_colour)
         self.adjust_x = -int(self.text_img.get_rect().width//2)
         self.adjust_y = -int(self.text_img.get_rect().height//2)
@@ -48,7 +49,6 @@ class Menu_Button:
         if self.text_hitbox.collidepoint(x,y): 
             return True, self.identifier
         return False, ""
-
 
 class Selection_Field: 
     def __init__(self, title_text, options, startx, y, index_selected=0): 
@@ -112,7 +112,6 @@ class Selection_Field:
                 return
             
             counter += 1 
-
 
 class Icon_Button: 
     def __init__(self, img, x,y, width,height, identifier): 

@@ -32,7 +32,7 @@ wooden_background_image = pygame.transform.scale(pygame.image.load(f"./Images/Ba
 # pre 
 
 def central_main(): 
-    current_screen_identifier = "main_menu"
+    current_screen_identifier = "play_puzzles_game"
     running = True 
     while running: 
         if current_screen_identifier == "main_menu": current_screen_identifier = main_menu_screen()
@@ -224,7 +224,41 @@ def in_game_settings():
     pass
 
 def play_puzzles_game(): 
-    pass 
+    # board = Board(screen,is_inverted=False,is_bot_playing=False)
+
+    return_button = Icon_Button("back_arrow.png", 50,50,100,100, "general_play_menu")
+    fen = "r2qrn1k/1pp1b1p1/3p1p2/p3p2p/P1QnP2P/2NPB2b/BPP2PP1/2KR3R"
+    board = Board(screen, is_inverted=True, is_bot_playing=False)
+    print(board.flip_fen_position(fen))
+    board.fen_to_board(board.flip_fen_position(fen), "white")
+    
+    running = True
+    while running: 
+        pygame.display.update()
+        for event in pygame.event.get(): 
+            if event.type == pygame.QUIT: 
+                running = False
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                x,y = pygame.mouse.get_pos()
+                board.process_square_click(x,y,"down")
+            elif event.type == pygame.MOUSEBUTTONUP: 
+                x,y = pygame.mouse.get_pos()
+                board.process_square_click(x,y,"up")
+                
+                is_clicked, identifier = return_button.check_is_clicked(x,y)
+                if is_clicked: 
+                    return identifier
+
+            elif event.type == pygame.KEYDOWN: 
+                if event.key == pygame.K_LEFT: 
+                    board.undo_last_move()
+                    
+        screen.blit(wooden_background_image, (0,0))
+        board.draw_board()
+        return_button.draw(screen)
+     
 
 def pre_vs_computer_settings(): 
     running = True 
