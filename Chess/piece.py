@@ -125,6 +125,7 @@ class Pawn(Piece):
         self.just_moved_2_squares = False # allows for en passant 
         self.value = 1 
         self.is_inverted= is_inverted
+        self.colour = colour
 
     def legal_moves(self,board, row,col, colour_moving):
     
@@ -492,6 +493,7 @@ class King(Piece):
         self.value = 10000 # infinite
         self.castled = False
         self.is_inverted = is_inverted
+        self.colour = colour
 
     def legal_moves(self,board, row,col,colour_moving): 
         moves = []

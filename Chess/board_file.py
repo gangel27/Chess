@@ -330,7 +330,7 @@ class Board:
                         self.board[row][col].just_moved_2_squares = True
         if self.is_bot_playing: 
             self.thread_make_ai_think = self.return_new_ai_thread().start()
-    
+
     def return_new_ai_thread(self): 
         return threading.Thread(target=self.simulate_bot,daemon=False)
     
@@ -440,6 +440,31 @@ class Board:
             for j in range(8): 
                 self.board[i][j] = 0 
     
+    def flip_board(self): 
+        self.is_inverted = not(self.is_inverted)
+        temp_board = [
+            self.board[7][::-1],
+            self.board[6][::-1],
+            self.board[5][::-1],
+            self.board[4][::-1],
+            self.board[3][::-1], 
+            self.board[2][::-1], 
+            self.board[1][::-1],
+            self.board[0][::-1]
+        ]
+        self.board = temp_board
+        for row in range(8): 
+            for col in range(8): 
+                if self.board[row][col] != 0:
+                    if self.board[row][col].name == "pawn" or self.board[row][col].name == "king": 
+                        self.board[row][col].is_inverted = not(self.board[row][col].is_inverted)
+
+        
+        self.selected_moving_square = (-1,-1)
+        self.last_move_from = (-1,-1)
+        self.last_move_to = (-1,-1)
+        self.legal_moves_for_selected_piece = [(-1,-1)]
+
     def convert_modified_fen_to_board(pos,move):
         # pos: rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1
         pass

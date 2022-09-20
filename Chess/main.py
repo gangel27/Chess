@@ -5,7 +5,7 @@ from threading import Thread
 import json 
 
 
-from button import Menu_Button, Selection_Field, Icon_Button
+from button import Flip_Button, Menu_Button, Selection_Field, Icon_Button
 
 pygame.init()
 
@@ -50,6 +50,7 @@ def play_friend_game(is_inverted=False,is_bot_playing=False):
     board = Board(screen,is_inverted=is_inverted,is_bot_playing=is_bot_playing)
 
     return_button = Icon_Button("back_arrow.png", 50,50,100,100, "general_play_menu")
+    flip_button = Flip_Button("flip_board.png", 900, 350, 200, 200)
 
     
     running = True
@@ -68,8 +69,12 @@ def play_friend_game(is_inverted=False,is_bot_playing=False):
                 board.process_square_click(x,y,"up")
                 
                 is_clicked, identifier = return_button.check_is_clicked(x,y)
+
                 if is_clicked: 
                     return identifier
+                
+                if flip_button.check_is_clicked(x,y): 
+                    board.flip_board()
 
             elif event.type == pygame.KEYDOWN: 
                 if event.key == pygame.K_LEFT: 
@@ -78,6 +83,7 @@ def play_friend_game(is_inverted=False,is_bot_playing=False):
         screen.blit(wooden_background_image, (0,0))
         board.draw_board()
         return_button.draw(screen)
+        flip_button.draw(screen)
 
 def main_menu_screen(): # 630x645 to work with form 0,0
     running = True

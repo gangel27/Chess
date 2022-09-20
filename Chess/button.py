@@ -132,6 +132,23 @@ class Icon_Button:
             return True, self.identifier
         return False, ""
 
+class Flip_Button: 
+    def __init__(self, img, x,y,width,height): 
+        self.width = width
+        self.height = height 
+        self.x = x 
+        self.y = y 
+        self.img = pygame.transform.scale(pygame.image.load(f"./Images/Icons/{img}"), (self.width, self.height))
+        self.img_hitbox = pygame.Rect(self.x, self.y, self.width, self.height)
+    
+    def draw(self, screen): 
+        screen.blit(self.img, (self.x, self.y))
+    
+    def check_is_clicked(self,x,y): 
+        if self.img_hitbox.collidepoint((x,y)): 
+            return True 
+        return False 
+    
 
 
 
