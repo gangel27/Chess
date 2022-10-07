@@ -65,7 +65,7 @@ def is_in_check(local_board, colour_moving): # edit this function when added pie
     return in_check
 
 
-def is_in_checkmate(board,colour_moving):
+def is_in_checkmate_or_stalemate(board,colour_moving): # returns if the player doesn't have a legal move 
         possible_moves = []
         for i in range(8):
             for j in range(8):
@@ -75,14 +75,12 @@ def is_in_checkmate(board,colour_moving):
 
                         for move in moves_for_piece:
                             if move != (-1,-1):
-
                                 possible_moves.append(move)
 
         if possible_moves == []:
             return True
         return False
-
-
+        
 class Piece: 
     def __init__(self,screen, colour): 
         self.screen = screen 

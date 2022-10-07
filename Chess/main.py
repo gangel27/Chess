@@ -265,7 +265,6 @@ def play_puzzles_game():
         board.draw_board()
         return_button.draw(screen)
      
-
 def pre_vs_computer_settings(): 
     running = True 
 
@@ -326,7 +325,6 @@ def pre_vs_computer_settings():
         return_button.draw(screen)
         screen.blit(title_font_img, (title_font_x + adjust_x, title_font_y + adjust_y))
         
- 
 
 if __name__ == "__main__": 
     central_main()

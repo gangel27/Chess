@@ -1,5 +1,5 @@
 from random import choice
-from piece import Pawn, Knight, Bishop, King, Queen, Rook, is_in_check,find_king_pos, is_in_checkmate
+from piece import Pawn, Knight, Bishop, King, Queen, Rook, is_in_check,find_king_pos, is_in_checkmate_or_stalemate
 import pygame 
 
 def return_all_legal_moves(board, colour="black"):

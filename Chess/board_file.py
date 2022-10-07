@@ -1,9 +1,7 @@
 
-from unittest import skip
-from piece import Pawn, Knight, Bishop, King, Queen, Rook, is_in_check,find_king_pos,is_in_checkmate
+from piece import Pawn, Knight, Bishop, King, Queen, Rook, is_in_check,find_king_pos, is_in_checkmate_or_stalemate
 import pygame 
 import threading
-from time import sleep 
 from bot import Material_Bot, Search_Tree_bot
 
 
@@ -18,6 +16,7 @@ class Board:
         [0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0]
         ]
+
 
         WHITE = (255,255,255)
         BROWN = (139,69,19)
@@ -75,6 +74,17 @@ class Board:
         self.CHECKMATE_BOX = self.CHECKMATE_TEXT.get_rect()
         self.CHECKMATE_BOX.center = (self.MIDPOINT_X, self.MIDPOINT_Y)
 
+
+        self.STALEMATE_FONT_STYLE = 'freesansbold.ttf'
+        self.STALEMATE_FONT_SIZE = 64 
+        self.STALEMATE_FONT_COLOUR = GREEN
+        self.STALEMATE_BG_COLOUR = GREY 
+
+        self.STALEMATE_FONT = pygame.font.Font(self.STALEMATE_FONT_STYLE, self.STALEMATE_FONT_SIZE)
+        self.STALEMATE_TEXT = self.STALEMATE_FONT.render('Stalemate!', True, self.STALEMATE_FONT_COLOUR,self.STALEMATE_BG_COLOUR)
+        self.STALEMATE_BOX = self.STALEMATE_TEXT.get_rect()
+        self.STALEMATE_BOX.center = (self.MIDPOINT_X, self.MIDPOINT_Y)
+
         self.minmax_bot = Search_Tree_bot()
         self.bot_depth = 3
         self.is_inverted = is_inverted
@@ -97,7 +107,7 @@ class Board:
         colour = self.SQUARE_COLOUR_1
         for i in range(8):
             for j in range(8):
-               
+
                 x = self.LEFT_MARGIN + (j * self.SQUARE_DIMENSION)
                 y = self.TOP_MARGIN + (i * self.SQUARE_DIMENSION)
             
@@ -124,15 +134,31 @@ class Board:
         self.draw_highlighted_selected_square()
         self.draw_highlighted_legal_moves()
         self.draw_pieces()
+        self.draw_if_in_checkmate()
+        self.draw_if_in_stalemate()
+    
+    def draw_if_in_stalemate(self): 
+        if self.in_stalemate:
+            x = threading.Thread(target=self.blit_stalemate)
+            x.start() 
+    
+    def blit_stalemate(self): 
+        self.screen.blit(self.STALEMATE_TEXT, self.STALEMATE_BOX)
+        t = threading.Timer(3.0, self.reset_board)
+        t.start()
 
-        self.draw_if_in_checkmate()   
+
+
+    
     
     def draw_last_move(self):
-        if self.last_move_from != (-1,-1) and self.last_move_to != (-1,-1):
+        if self.last_move_from != (-1,-1) and self.last_move_to != (-1,-1): 
+            # last move from 
             x,y = self.row_col_to_coordinates_conversion(self.last_move_from[0],self.last_move_from[1])
             from_square = pygame.Rect(x,y,self.SQUARE_DIMENSION,self.SQUARE_DIMENSION)
             pygame.draw.rect(self.screen, self.HIGHLIGHT_COLOUR_LAST_MOVE_FROM, from_square)
 
+            # last move to 
             x,y = self.row_col_to_coordinates_conversion(self.last_move_to[0],self.last_move_to[1])
             to_square = pygame.Rect(x,y,self.SQUARE_DIMENSION,self.SQUARE_DIMENSION)
             pygame.draw.rect(self.screen, self.HIGHLIGHT_COLOUR_LAST_MOVE_TO, to_square)
@@ -299,6 +325,7 @@ class Board:
             self.board[0][5] = Bishop(self.screen,"white")
             self.board[0][6] = Knight(self.screen,"white")
             self.board[0][7] = Rook(self.screen,"white")
+        
 
     def move_selected_piece(self,row,col):
         # moves the currently selecting moving piece, to the square taken as a paramter, has already been checked for legality 
@@ -320,6 +347,7 @@ class Board:
                 self.check_if_en_passant(row,col)
                 self.alternate_move_color()
                 self.set_pawns_just_moved_2_squares_false() # just_moved_2_squares = False
+                
             
                 if self.board[row][col].name == "pawn" or self.board[row][col].name=="rook" or self.board[row][col].name=="king":
                     self.board[row][col].moved = True
@@ -425,7 +453,7 @@ class Board:
                                 self.board[row][col].castled = True
 
     def undo_last_move(self): 
-        pass
+        
         if self.last_move_from != (-1,-1) or self.last_move_to != (-1,-1):
             self.board[self.last_move_from[0]][self.last_move_from[1]] = self.board[self.last_move_to[0]][self.last_move_to[1]]
             self.board[self.last_move_to[0]][self.last_move_to[1]] = self.last_move_to_piece
@@ -505,9 +533,10 @@ class Board:
                     if is_in_check(self.board, self.current_colour_moving):
                         self.check_pos = find_king_pos(self.board, self.current_colour_moving)
                         self.currently_in_check = True 
-                        self.in_checkmate = is_in_checkmate(self.board, self.current_colour_moving)
+                        self.in_checkmate = is_in_checkmate_or_stalemate(self.board, self.current_colour_moving)
                         
                     else:
+                        self.in_stalemate = is_in_checkmate_or_stalemate(self.board, self.current_colour_moving)
                         self.currently_in_check = False
                         self.check_pos = (-1,-1)
                     is_processed = True
@@ -589,7 +618,7 @@ class Board:
             if is_in_check(self.board, self.current_colour_moving):
                 self.check_pos = find_king_pos(self.board, self.current_colour_moving)
                 self.currently_in_check = True 
-                self.in_checkmate = is_in_checkmate(self.board, self.current_colour_moving)
+                self.in_checkmate = is_in_checkmate_or_stalemate(self.board, self.current_colour_moving)
             else:
                 self.currently_in_check = False
                 self.check_pos = (-1,-1)
