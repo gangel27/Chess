@@ -2,7 +2,7 @@
 from piece import Pawn, Knight, Bishop, King, Queen, Rook, is_in_check,find_king_pos, is_in_checkmate_or_stalemate
 import pygame 
 import threading
-from bot import Material_Bot, Search_Tree_bot
+from bot import Search_Tree_bot
 
 
 class Board: 
@@ -147,10 +147,6 @@ class Board:
         t = threading.Timer(3.0, self.reset_board)
         t.start()
 
-
-
-    
-    
     def draw_last_move(self):
         if self.last_move_from != (-1,-1) and self.last_move_to != (-1,-1): 
             # last move from 
@@ -326,7 +322,6 @@ class Board:
             self.board[0][6] = Knight(self.screen,"white")
             self.board[0][7] = Rook(self.screen,"white")
         
-
     def move_selected_piece(self,row,col):
         # moves the currently selecting moving piece, to the square taken as a paramter, has already been checked for legality 
         # unhighlight piece. 
@@ -356,6 +351,7 @@ class Board:
                     squares_moved = abs(self.last_move_from[0]- self.last_move_to[0])
                     if squares_moved == 2:
                         self.board[row][col].just_moved_2_squares = True
+                        
         if self.is_bot_playing: 
             self.thread_make_ai_think = self.return_new_ai_thread().start()
 
@@ -430,27 +426,27 @@ class Board:
             queenside_dir = 1 
             king_rook_col = 0 
             queen_rook_col = 7
-
-        if self.board[row][col].name == "king":
-            if col == king_starting_col + (2*kingside_dir) and row == home: # kingside
-                if self.board[home][king_rook_col] != 0:
-                    if self.board[home][king_rook_col].name == "rook":
-                        if self.board[home][king_rook_col].moved == False: # if rook hasnt' moved
-                            if self.board[home][king_starting_col + (2*kingside_dir)].moved == False: # if king hasnt' moved
-                                self.board[home][king_starting_col+kingside_dir] = self.board[home][king_rook_col]
-                                self.board[home][king_rook_col] = 0
-                                self.board[home][king_starting_col+kingside_dir].moved = True
-                                self.board[row][col].castled = True
-            
-            if col == king_starting_col +(2*queenside_dir) and row == home: # queenside
-                if self.board[home][queen_rook_col] != 0:
-                    if self.board[home][queen_rook_col].name == "rook":
-                        if self.board[home][queen_rook_col].moved == False:
-                            if self.board[home][king_starting_col + (2*queenside_dir)].moved == False:
-                                self.board[home][king_starting_col+queenside_dir] = self.board[home][queen_rook_col]
-                                self.board[home][queen_rook_col] = 0
-                                self.board[home][king_starting_col+queenside_dir].moved = True
-                                self.board[row][col].castled = True
+        if not is_in_check(self.board, self.current_colour_moving):
+            if self.board[row][col].name == "king":
+                if col == king_starting_col + (2*kingside_dir) and row == home: # kingside
+                    if self.board[home][king_rook_col] != 0:
+                        if self.board[home][king_rook_col].name == "rook":
+                            if self.board[home][king_rook_col].moved == False: # if rook hasnt' moved
+                                if self.board[home][king_starting_col + (2*kingside_dir)].moved == False: # if king hasnt' moved
+                                    self.board[home][king_starting_col+kingside_dir] = self.board[home][king_rook_col]
+                                    self.board[home][king_rook_col] = 0
+                                    self.board[home][king_starting_col+kingside_dir].moved = True
+                                    self.board[row][col].castled = True
+                
+                if col == king_starting_col +(2*queenside_dir) and row == home: # queenside
+                    if self.board[home][queen_rook_col] != 0:
+                        if self.board[home][queen_rook_col].name == "rook":
+                            if self.board[home][queen_rook_col].moved == False:
+                                if self.board[home][king_starting_col + (2*queenside_dir)].moved == False:
+                                    self.board[home][king_starting_col+queenside_dir] = self.board[home][queen_rook_col]
+                                    self.board[home][queen_rook_col] = 0
+                                    self.board[home][king_starting_col+queenside_dir].moved = True
+                                    self.board[row][col].castled = True
 
     def undo_last_move(self): 
         
@@ -462,7 +458,7 @@ class Board:
             self.last_move_from = (-1,-1)
             self.last_move_to = (-1,-1)
             self.alternate_move_color() # reverts move colour back
-    
+
     def clear_board(self): 
         for i in range(8):
             for j in range(8): 
@@ -561,18 +557,19 @@ class Board:
         if not is_processed: # highlights a square also want the piece to follow the mouse 
             if not error: 
                 if self.board[row][col] != 0:
-                    self.selected_moving_square = (row,col)
-                    if self.board[row][col] != 0:
-                        self.legal_moves_for_selected_piece = self.board[row][col].legal_moves(self.board, row,col, self.current_colour_moving)
-                        if self.is_bot_playing: 
-                            if self.board[row][col].colour != self.user_colour: 
-                                self.legal_moves_for_selected_piece = [(-1,-1)]
+                    if click_type == "down": 
+                        self.selected_moving_square = (row,col)
+                        if self.board[row][col] != 0:
+                            self.legal_moves_for_selected_piece = self.board[row][col].legal_moves(self.board, row,col, self.current_colour_moving)
+                            if self.is_bot_playing: 
+                                if self.board[row][col].colour != self.user_colour: 
+                                    self.legal_moves_for_selected_piece = [(-1,-1)]
 
-                        if click_type == "down":
-                            if self.board[row][col].colour == self.current_colour_moving:
-                                self.board[row][col].follow_mouse = True 
-                    else:
-                        self.legal_moves_for_selected_piece = [(-1,-1)]
+                            if click_type == "down":
+                                if self.board[row][col].colour == self.current_colour_moving:
+                                    self.board[row][col].follow_mouse = True 
+                        else:
+                            self.legal_moves_for_selected_piece = [(-1,-1)]
             else: # clicked outside the range of the board
                 self.selected_moving_square = (-1,-1)
                 self.legal_moves_for_selected_piece = [(-1,-1)]
@@ -599,6 +596,7 @@ class Board:
         return (row,col, error )
     
     def simulate_bot(self):
+        print('simulating bot..,')
         
         if self.current_colour_moving == "black" and not self.in_checkmate:
             # from_row, from_col, to_row, to_col = return_random_ai_move(self.board, "black")

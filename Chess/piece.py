@@ -562,26 +562,30 @@ class King(Piece):
             queenside_dir = 1 
             queen_rook_col = 7
 
+        print(is_in_check(board, colour_moving))
 
         # castling kingside
         if self.moved == False: # king hasn't moved
             if board[home][king_rook_col] != 0:
-                if board[home][king_rook_col].name == "rook":
-                    if board[home][king_rook_col].moved == False: # rook hasn't moved
-                        if board[home][king_starting_col+kingside_dir] == 0 and board[home][king_starting_col+(2*kingside_dir)] == 0:# empty squares in between 
-                            if (home,king_starting_col+kingside_dir) in moves: # makes sure the thing doesn't move thorugh check - already been checked.
-                                moves.append((home,king_starting_col+(2*kingside_dir)))
+                if not is_in_check(board, colour_moving): 
+                    if board[home][king_rook_col].name == "rook":
+                        if board[home][king_rook_col].moved == False: # rook hasn't moved
+                            if board[home][king_starting_col+kingside_dir] == 0 and board[home][king_starting_col+(2*kingside_dir)] == 0:# empty squares in between 
+                                if (home,king_starting_col+kingside_dir) in moves: # makes sure the thing doesn't move thorugh check - already been checked.
+                                    moves.append((home,king_starting_col+(2*kingside_dir)))
 
             
         # castling queenside
         if self.moved == False: # king hasn't moved
             if board[home][queen_rook_col] != 0:
-                if board[home][queen_rook_col].name == "rook":
-                    if board[home][queen_rook_col].moved == False: # if rook hasnt' move 
-                        if board[home][king_starting_col+queenside_dir] == 0 and board[home][king_starting_col+(2*queenside_dir)] == 0 and board[home][king_starting_col+(3*queenside_dir)] == 0: # empty squares
-                            if (home,king_starting_col+queenside_dir) in moves: # makes sure the thing doesn't move thorugh check - already been checked.
-                                moves.append((home,king_starting_col+(2*queenside_dir)))
-          
+                if not is_in_check(board, colour_moving): 
+
+                    if board[home][queen_rook_col].name == "rook":
+                        if board[home][queen_rook_col].moved == False: # if rook hasnt' move 
+                            if board[home][king_starting_col+queenside_dir] == 0 and board[home][king_starting_col+(2*queenside_dir)] == 0 and board[home][king_starting_col+(3*queenside_dir)] == 0: # empty squares
+                                if (home,king_starting_col+queenside_dir) in moves: # makes sure the thing doesn't move thorugh check - already been checked.
+                                    moves.append((home,king_starting_col+(2*queenside_dir)))
+            
 
         # so that you can't castle into check 
         moves = filter_legal_moves_for_check(board,row,col,moves,colour_moving)

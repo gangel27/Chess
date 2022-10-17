@@ -5,7 +5,8 @@ from threading import Thread
 import json 
 
 
-from button import Flip_Button, Menu_Button, Selection_Field, Icon_Button
+from button import Flip_Button, Menu_Button, Selection_Field, Icon_Button, Tutorial_Button
+from tutorial_screen import Tutorial_Screen
 
 pygame.init()
 
@@ -18,8 +19,9 @@ GREY = "#7b7b7b"
 BURGANDY = "#66001a"
 
 screen = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT),pygame.RESIZABLE)
-menu_background_image = pygame.transform.scale(pygame.image.load(f"./Images/Backgrounds/chess_pieces.jpg"), (SCREEN_WIDTH, SCREEN_HEIGHT))
+ 
 wooden_background_image = pygame.transform.scale(pygame.image.load(f"./Images/Backgrounds/wooden.jpg"), (SCREEN_WIDTH, SCREEN_HEIGHT))
+menu_background_image = pygame.transform.scale(pygame.image.load(f"./Images/Backgrounds/chess_pieces.jpg"), (SCREEN_WIDTH, SCREEN_HEIGHT))
 # main menu 
 # tutorial game
 # quit 
@@ -32,7 +34,7 @@ wooden_background_image = pygame.transform.scale(pygame.image.load(f"./Images/Ba
 # pre 
 
 def central_main(): 
-    current_screen_identifier = "play_puzzles_game"
+    current_screen_identifier = "tutorial_game"
     running = True 
     while running: 
         if current_screen_identifier == "main_menu": current_screen_identifier = main_menu_screen()
@@ -120,8 +122,6 @@ def main_menu_screen(): # 630x645 to work with form 0,0
                 running = False
                 pygame.quit()
                 sys.exit()
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                pass
             elif event.type == pygame.MOUSEBUTTONUP: 
                 x,y = pygame.mouse.get_pos()
                 for button in buttons:
@@ -186,7 +186,42 @@ def general_play_menu():
         screen.blit(title_font_img, (title_font_x + adjust_x, title_font_y + adjust_y))
 
 def tutorial_screen():
-    pass
+    font_size = 40 
+    return_button = Menu_Button(SCREEN_WIDTH//4 , SCREEN_HEIGHT * 0.7, "Return", "main_menu", font_size)
+    tutorial_text = Tutorial_Screen(screen, 100, 150, 4)
+    navigation_buttons = Tutorial_Button(screen, 285, 530)
+    buttons = [return_button]
+    running = True
+    while running: 
+        pygame.display.update()
+        for event in pygame.event.get(): 
+            if event.type == pygame.QUIT: 
+                running = False
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                pass
+            elif event.type == pygame.MOUSEBUTTONUP: 
+                x,y = pygame.mouse.get_pos()
+                for button in buttons:
+                    is_clicked, identifier = button.check_is_clicked(x,y)
+                    if is_clicked: 
+                        return identifier
+                is_clicked, increment = navigation_buttons.check_if_clicked(x,y,)
+                if is_clicked: 
+                    if increment == 1: 
+                        tutorial_text.increase_current_text_index()
+                    else: 
+                        tutorial_text.decrease_current_text_index()
+
+                
+        screen.blit(menu_background_image,(0,0))
+        navigation_buttons.draw()
+        tutorial_text.draw()
+        for button in buttons:
+            button.draw(screen)
+
+        
 
 def quit_game_screen(): 
     pygame.quit()

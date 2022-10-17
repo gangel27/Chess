@@ -6,6 +6,8 @@ GREEN = (0,200,0,0.75)
 WHITE = (200,200,200,0.25)
 BLACK = (10,10,10,0.95)
 GREY = "#7b7b7b"
+DARK_GREEN = (0,100,0)
+DARK_GREEN = (34,139,34)
 
 class Menu_Button: 
     def __init__(self,x, y, text, identifier, font_size): 
@@ -19,8 +21,7 @@ class Menu_Button:
         self.font = pygame.font.Font(self.font_style, self.font_size)
         pygame.font.Font.set_underline(self.font, True)
         self.is_hovering = False
-        self.hover_colour = "#D3D3D3"
-        self.hover_colour = "#ffffff"
+        self.hover_colour = DARK_GREEN
         self.text_img = self.font.render(self.text, True, self.font_colour)
         self.adjust_x = -int(self.text_img.get_rect().width//2)
         self.adjust_y = -int(self.text_img.get_rect().height//2)
@@ -56,14 +57,14 @@ class Selection_Field:
         self.options = options
         self.startx = startx
         self.y = y 
-        self.options_hover_colour = GREY
-        self.options_selected_colour = GREY
+        self.options_hover_colour = DARK_GREEN
+        self.options_selected_colour = DARK_GREEN
         self.index_selected = index_selected
  
         self.gap_x = 100 
         self.initial_gap_x = 250
 
-        self.title_font_size = 30 
+        self.title_font_size = 30
         self.title_font_colour = BLACK
         self.title_font_style = 'freesansbold.ttf'
         self.title_font = pygame.font.Font(self.title_font_style, self.title_font_size)
@@ -150,7 +151,53 @@ class Flip_Button:
         return False 
     
 
+class Tutorial_Button: 
+    def __init__(self, screen, x, y): 
+        self.screen = screen 
+        self.x = x 
+        self.y = y
 
+        self.x_gap = 150
+
+        self.options_font_colour = BLACK 
+        self.options_font_style = 'freesansbold.ttf'
+        self.options_font_size = 50
+        self.options_font = pygame.font.Font(self.options_font_style, self.options_font_size)
+        pygame.font.Font.set_underline(self.options_font, True)
+
+  
+        self.hover_colour = DARK_GREEN
+        
+        self.img1 = self.options_font.render("<", True, self.options_font_colour)
+        self.img2 = self.options_font.render(">", True, self.options_font_colour)
+
+        self.img1_hitbox = pygame.Rect(x - self.x_gap, self.y, self.img1.get_rect().width,self.img1.get_rect().height)
+        self.img2_hitbox = pygame.Rect(x + self.x_gap, self.y, self.img2.get_rect().width,self.img2.get_rect().height)
+
+
+    def draw(self): 
+        self.check_if_hovering()
+        self.screen.blit(self.img1, (self.x - self.x_gap , self.y))
+        self.screen.blit(self.img2, (self.x + self.x_gap, self.y))
+
+    def check_if_hovering(self): 
+        if self.img1_hitbox.collidepoint(pygame.mouse.get_pos()): 
+            self.img1 = self.options_font.render("<", True, self.hover_colour)
+        else: 
+            self.img1 = self.options_font.render("<", True, self.options_font_colour)
+        
+        if self.img2_hitbox.collidepoint(pygame.mouse.get_pos()): 
+            self.img2 = self.options_font.render(">", True, self.hover_colour)
+        else: 
+            self.img2 = self.options_font.render(">", True, self.options_font_colour)
+
+
+    def check_if_clicked(self,x,y): 
+        if self.img1_hitbox.collidepoint(x,y): 
+            return True, -1
+        if self.img2_hitbox.collidepoint(x,y): 
+            return True, +1
+        return False, 0 
 
 
 
