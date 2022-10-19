@@ -39,6 +39,7 @@ class Board:
         LICHESS_COLD_LEGAL_MOVE = (93,122,104)
         LICHESS_COLD_MOVE_FROM = (131,155,133)
         LICHESS_COLD_MOVE_TO = (152,176,127)
+        PEACH = (255,229,180)
 
         self.TOP_MARGIN = 100
         self.LEFT_MARGIN = 300
@@ -84,6 +85,27 @@ class Board:
         self.STALEMATE_TEXT = self.STALEMATE_FONT.render('Stalemate!', True, self.STALEMATE_FONT_COLOUR,self.STALEMATE_BG_COLOUR)
         self.STALEMATE_BOX = self.STALEMATE_TEXT.get_rect()
         self.STALEMATE_BOX.center = (self.MIDPOINT_X, self.MIDPOINT_Y)
+
+        x_buffer = self.LEFT_MARGIN//8
+        box_width = 180
+        box_height = 215
+        self.CAPTURED_PIECE_BOX_BACKGROUND_COLOUR = self.SQUARE_COLOUR_1
+        self.pieces_selected_top_box = pygame.Rect(x_buffer + self.RIGHT,self.TOP_MARGIN,box_width,box_height)
+        self.pieces_selected_bottom_box = pygame.Rect(self.LEFT_MARGIN - x_buffer - box_width, self.BOTTOM - box_height, box_width,box_height)
+        self.piece_captured_index = { 
+            "pawn": 0, 
+            "knight": 1, 
+            "bishop": 2, 
+            "rook": 3, 
+            "queen": 4
+        }
+        self.number_of_identical_captured_pieces = {
+            "pawn": {"white": 0, "black": 0},
+            "knight": {"white": 0, "black": 0},
+            "bishop": {"white": 0, "black": 0},
+            "rook": {"white": 0, "black": 0},
+            "queen": {"white": 0, "black": 0}
+        }
 
         self.minmax_bot = Search_Tree_bot()
         self.bot_depth = 3
@@ -136,6 +158,7 @@ class Board:
         self.draw_pieces()
         self.draw_if_in_checkmate()
         self.draw_if_in_stalemate()
+        self.draw_captured_pieces()
     
     def draw_if_in_stalemate(self): 
         if self.in_stalemate:
@@ -250,6 +273,18 @@ class Board:
         if self.in_checkmate:
             x = threading.Thread(target=self.blit_checkmate)
             x.start()
+    
+    def draw_captured_pieces(self): 
+        self.draw_captured_pieces_backgrounds()
+      
+        for piece in self.pieces_white_has_captured:
+            piece.draw_icon(self.piece_captured_index[piece.name], self.number_of_identical_captured_pieces[piece.name][piece.colour], piece.colour, self.is_inverted)
+        for piece in self.pieces_black_has_captured: 
+            piece.draw_icon(self.piece_captured_index[piece.name], self.number_of_identical_captured_pieces[piece.name][piece.colour], piece.colour, self.is_inverted)
+
+    def draw_captured_pieces_backgrounds(self): 
+        pygame.draw.rect(self.screen, self.CAPTURED_PIECE_BOX_BACKGROUND_COLOUR, self.pieces_selected_top_box)
+        pygame.draw.rect(self.screen, self.CAPTURED_PIECE_BOX_BACKGROUND_COLOUR, self.pieces_selected_bottom_box)
             
     def reset_board(self):
         self.board = [[0,0,0,0,0,0,0,0],
@@ -271,6 +306,8 @@ class Board:
         self.last_move_to = (-1,-1)
         self.in_checkmate = False 
         self.in_stalemate = False
+        self.pieces_white_has_captured = []
+        self.pieces_black_has_captured = []
         self.last_move_to_piece = 0
         
         if not self.is_inverted:
@@ -321,6 +358,7 @@ class Board:
             self.board[0][5] = Bishop(self.screen,"white")
             self.board[0][6] = Knight(self.screen,"white")
             self.board[0][7] = Rook(self.screen,"white")
+
         
     def move_selected_piece(self,row,col):
         # moves the currently selecting moving piece, to the square taken as a paramter, has already been checked for legality 
@@ -328,6 +366,17 @@ class Board:
         # remove legal moves 
         if row != -1 and col != -1:
             if self.selected_moving_square != (-1,-1):
+
+                # adds to captured piece 
+                if self.board[row][col] != 0:
+                    piece = self.board[row][col]
+                    if piece.colour == "white": 
+                        self.pieces_black_has_captured.append(piece)
+                        
+                    elif piece.colour == "black": 
+                        self.pieces_white_has_captured.append(piece)
+                    self.number_of_identical_captured_pieces[piece.name][piece.colour] += 1 
+
                 self.last_move_to_piece = self.board[row][col] # here 
                 self.board[row][col] = self.board[self.selected_moving_square[0]][self.selected_moving_square[1]]
                 self.board[self.selected_moving_square[0]][self.selected_moving_square[1]] = 0

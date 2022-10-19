@@ -34,7 +34,7 @@ menu_background_image = pygame.transform.scale(pygame.image.load(f"./Images/Back
 # pre 
 
 def central_main(): 
-    current_screen_identifier = "tutorial_game"
+    current_screen_identifier = "play_friend_game"
     running = True 
     while running: 
         if current_screen_identifier == "main_menu": current_screen_identifier = main_menu_screen()
@@ -51,8 +51,8 @@ def play_friend_game(is_inverted=False,is_bot_playing=False):
     
     board = Board(screen,is_inverted=is_inverted,is_bot_playing=is_bot_playing)
 
-    return_button = Icon_Button("back_arrow.png", 50,50,100,100, "general_play_menu")
-    flip_button = Flip_Button("flip_board.png", 900, 350, 200, 200)
+    return_button = Icon_Button("back_arrow_white.png", 50,50,100,100, "general_play_menu")
+    flip_button = Flip_Button("flip_board.png", 900, 350, 100, 100)
 
     
     running = True
@@ -93,7 +93,7 @@ def main_menu_screen(): # 630x645 to work with form 0,0
     font_size = 40
     button_x = 315
     button_start_y = 350
-    title_font_style = "main_font.ttf"
+  
 
     title_font_size = 120
     title_text = "Chess"
@@ -232,7 +232,7 @@ def play_vs_computer(is_inverted=False):
         data = json.load(json_file)
         
         board = Board(screen,is_inverted,True, data['AI-Depth'], data['AI-Evaluation-Strength'])
-        return_button = Icon_Button("back_arrow.png", 50,50,100,100, "general_play_menu")
+        return_button = Icon_Button("back_arrow_white.png", 50,50,100,100, "general_play_menu")
     
     
     running = True;
@@ -267,7 +267,7 @@ def in_game_settings():
 def play_puzzles_game(): 
     # board = Board(screen,is_inverted=False,is_bot_playing=False)
 
-    return_button = Icon_Button("back_arrow.png", 50,50,100,100, "general_play_menu")
+    return_button = Icon_Button("back_arrow_white.png", 50,50,100,100, "general_play_menu")
     fen = "r2qrn1k/1pp1b1p1/3p1p2/p3p2p/P1QnP2P/2NPB2b/BPP2PP1/2KR3R"
     board = Board(screen, is_inverted=True, is_bot_playing=False)
     print(board.flip_fen_position(fen))

@@ -97,6 +97,15 @@ class Piece:
         self.set = 'lichess-set'
         self.follow_mouse = False
 
+        self.icon_width = 40
+        self.icon_height = 40 
+        self.icon_gap_y = 40 
+        self.icon_gap_x = 20
+        self.white_captured_pieces_box_x = 950
+        self.white_captured_pieces_box_y = 100 
+        self.black_captured_pieces_box_x = 100
+        self.black_captured_pieces_box_y = 500 
+
 
     def draw(self, x,y):
         if self.follow_mouse: 
@@ -112,12 +121,29 @@ class Piece:
             rect = img.get_rect()
             rect.center = (x,y)
             self.screen.blit(self.image_black, rect)
+    
+    def draw_icon(self, index, number_of_identical_pieces_captured,  colour, inverted): 
+        for i in range(number_of_identical_pieces_captured): 
+            if not inverted: 
+                if colour == "white": 
+                    self.screen.blit(self.icon_image_white, ((self.white_captured_pieces_box_x + (i*self.icon_gap_x)), self.white_captured_pieces_box_y + (self.icon_gap_y* index)))
+                else: 
+                    self.screen.blit(self.icon_image_black, ((self.black_captured_pieces_box_x + (i*self.icon_gap_x)), self.black_captured_pieces_box_y + (self.icon_gap_y* index)))
+            else: 
+                if colour == "white": 
+                    self.screen.blit(self.icon_image_white, ((self.black_captured_pieces_box_x + (i*self.icon_gap_x)), self.black_captured_pieces_box_y + (self.icon_gap_y* index)))
+                else: 
+                    self.screen.blit(self.icon_image_black, ((self.white_captured_pieces_box_x + (i*self.icon_gap_x)), self.white_captured_pieces_box_y + (self.icon_gap_y* index)))
+
+
       
 class Pawn(Piece): 
     def __init__(self,screen, colour,is_inverted=False): 
         super(Pawn, self).__init__(screen, colour)
         self.image_white = pygame.transform.scale(pygame.image.load(f"./Images/{self.set}/white_pawn.png"), (self.img_width, self.img_height))
         self.image_black = pygame.transform.scale(pygame.image.load(f"./Images/{self.set}/black_pawn.png"), (self.img_width, self.img_height))
+        self.icon_image_white = pygame.transform.scale(pygame.image.load(f"./Images/{self.set}/white_pawn.png"), (self.icon_width, self.icon_height))
+        self.icon_image_black = pygame.transform.scale(pygame.image.load(f"./Images/{self.set}/black_pawn.png"), (self.icon_width, self.icon_height))
         self.moved = False
         self.name = "pawn"
         self.just_moved_2_squares = False # allows for en passant 
@@ -128,8 +154,6 @@ class Pawn(Piece):
     def legal_moves(self,board, row,col, colour_moving):
     
         # 2 forwards, 1 forwards, caputre left, caputre right
-
-        
         
         moves = [] 
         if self.colour == "white":
@@ -211,6 +235,8 @@ class Knight(Piece):
         super(Knight, self).__init__(screen, colour)
         self.image_white = pygame.transform.scale(pygame.image.load(f"./Images/{self.set}/white_knight.png"), (self.img_width, self.img_height))
         self.image_black = pygame.transform.scale(pygame.image.load(f"./Images/{self.set}/black_knight.png"), (self.img_width, self.img_height))
+        self.icon_image_white = pygame.transform.scale(pygame.image.load(f"./Images/{self.set}/white_knight.png"), (self.icon_width, self.icon_height))
+        self.icon_image_black = pygame.transform.scale(pygame.image.load(f"./Images/{self.set}/black_knight.png"), (self.icon_width, self.icon_height))
         self.name = "knight"
         self.value = 3
         
@@ -321,6 +347,8 @@ class Bishop(Piece):
         super(Bishop, self).__init__(screen, colour)
         self.image_white = pygame.transform.scale(pygame.image.load(f"./Images/{self.set}/white_bishop.png"), (self.img_width, self.img_height))
         self.image_black = pygame.transform.scale(pygame.image.load(f"./Images/{self.set}/black_bishop.png"), (self.img_width, self.img_height))
+        self.icon_image_white = pygame.transform.scale(pygame.image.load(f"./Images/{self.set}/white_bishop.png"), (self.icon_width, self.icon_height))
+        self.icon_image_black = pygame.transform.scale(pygame.image.load(f"./Images/{self.set}/black_bishop.png"), (self.icon_width, self.icon_height))
         self.name = "bishop"
         self.value = 3 
 
@@ -486,6 +514,8 @@ class King(Piece):
         super(King, self).__init__(screen, colour)
         self.image_white = pygame.transform.scale(pygame.image.load(f"./Images/{self.set}/white_king.png"), (self.img_width, self.img_height))
         self.image_black = pygame.transform.scale(pygame.image.load(f"./Images/{self.set}/black_king.png"), (self.img_width, self.img_height))
+        self.icon_image_white = pygame.transform.scale(pygame.image.load(f"./Images/{self.set}/white_king.png"), (self.icon_width, self.icon_height))
+        self.icon_image_black = pygame.transform.scale(pygame.image.load(f"./Images/{self.set}/black_king.png"), (self.icon_width, self.icon_height))
         self.name = "king"
         self.moved = False 
         self.value = 10000 # infinite
@@ -630,6 +660,8 @@ class Queen(Piece):
         super(Queen, self).__init__(screen, colour)
         self.image_white = pygame.transform.scale(pygame.image.load(f"./Images/{self.set}/white_queen.png"), (self.img_width, self.img_height))
         self.image_black = pygame.transform.scale(pygame.image.load(f"./Images/{self.set}/black_queen.png"), (self.img_width, self.img_height))
+        self.icon_image_white = pygame.transform.scale(pygame.image.load(f"./Images/{self.set}/white_queen.png"), (self.icon_width, self.icon_height))
+        self.icon_image_black = pygame.transform.scale(pygame.image.load(f"./Images/{self.set}/black_queen.png"), (self.icon_width, self.icon_height))
         self.name = "queen"
         self.value = 9 
 
@@ -679,6 +711,8 @@ class Rook(Piece):
         super(Rook, self).__init__(screen, colour)
         self.image_white = pygame.transform.scale(pygame.image.load(f"./Images/{self.set}/white_rook.png"), (self.img_width, self.img_height))
         self.image_black = pygame.transform.scale(pygame.image.load(f"./Images/{self.set}/black_rook.png"), (self.img_width, self.img_height))
+        self.icon_image_white = pygame.transform.scale(pygame.image.load(f"./Images/{self.set}/white_rook.png"), (self.icon_width, self.icon_height))
+        self.icon_image_black = pygame.transform.scale(pygame.image.load(f"./Images/{self.set}/black_rook.png"), (self.icon_width, self.icon_height))
         self.name = "rook"
         self.moved = False
         self.value = 5 
