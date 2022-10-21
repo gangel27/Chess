@@ -52,7 +52,7 @@ def play_friend_game(is_inverted=False,is_bot_playing=False):
     board = Board(screen,is_inverted=is_inverted,is_bot_playing=is_bot_playing)
 
     return_button = Icon_Button("back_arrow_white.png", 50,50,100,100, "general_play_menu")
-    flip_button = Flip_Button("flip_board.png", 900, 350, 100, 100)
+    flip_button = Flip_Button(900, 350, 100, 100)
 
     
     running = True

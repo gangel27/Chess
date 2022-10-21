@@ -87,8 +87,8 @@ class Board:
         self.STALEMATE_BOX.center = (self.MIDPOINT_X, self.MIDPOINT_Y)
 
         x_buffer = self.LEFT_MARGIN//8
-        box_width = 180
-        box_height = 215
+        box_width = 165
+        box_height = 180
         self.CAPTURED_PIECE_BOX_BACKGROUND_COLOUR = self.SQUARE_COLOUR_1
         self.pieces_selected_top_box = pygame.Rect(x_buffer + self.RIGHT,self.TOP_MARGIN,box_width,box_height)
         self.pieces_selected_bottom_box = pygame.Rect(self.LEFT_MARGIN - x_buffer - box_width, self.BOTTOM - box_height, box_width,box_height)

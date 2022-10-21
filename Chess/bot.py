@@ -86,9 +86,6 @@ class Search_Tree_bot:
         # total_evaluation -= black_castled*1000
         return round(total_evaluation,4)
     
-    def is_known_position(self,board):
-        pass
-  
 
 
     

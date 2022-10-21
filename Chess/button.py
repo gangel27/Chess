@@ -121,34 +121,54 @@ class Icon_Button:
         self.height = height
         self.x = x - self.width//2
         self.y = y - self.height//2
-        self.img = pygame.transform.scale(pygame.image.load(f"./Images/Icons/{img}"), (self.width, self.height))
+        self.img = pygame.transform.scale(pygame.image.load(f"./Images/Icons/back_arrow_white.png"), (self.width, self.height))
+        self.hover_img = pygame.transform.scale(pygame.image.load(f"./Images/Icons/back_arrow_hover.png"), (self.width, self.height))
+        self.drawing_img = self.img
         self.identifier = identifier
         self.img_hitbox = pygame.Rect(self.x,self.y,self.width, self.height)
 
     def draw(self, screen): 
-        screen.blit(self.img, (self.x, self.y))
+        self.check_is_hover()
+        screen.blit(self.drawing_img, (self.x, self.y))
     
     def check_is_clicked(self,x,y): 
         if self.img_hitbox.collidepoint((x,y)): 
             return True, self.identifier
         return False, ""
+    
+    def check_is_hover(self): 
+        x,y = pygame.mouse.get_pos()
+        self.drawing_img = self.img
+        if self.img_hitbox.collidepoint((x,y)): 
+            self.drawing_img = self.hover_img
+        
 
 class Flip_Button: 
-    def __init__(self, img, x,y,width,height): 
+    def __init__(self, x,y,width,height): 
         self.width = width
         self.height = height 
         self.x = x 
         self.y = y 
-        self.img = pygame.transform.scale(pygame.image.load(f"./Images/Icons/{img}"), (self.width, self.height))
+        self.img = pygame.transform.scale(pygame.image.load(f"./Images/Icons/flip_board_normal.png"), (self.width, self.height))
+        self.hover_img = pygame.transform.scale(pygame.image.load(f"./Images/Icons/flip_board.png"), (self.width, self.height))
+        self.drawing_img = self.img
         self.img_hitbox = pygame.Rect(self.x, self.y, self.width, self.height)
     
     def draw(self, screen): 
-        screen.blit(self.img, (self.x, self.y))
+        self.check_is_hover()
+        screen.blit(self.drawing_img, (self.x, self.y))
     
     def check_is_clicked(self,x,y): 
         if self.img_hitbox.collidepoint((x,y)): 
             return True 
         return False 
+    
+    def check_is_hover(self): 
+        x,y = pygame.mouse.get_pos()
+        self.drawing_img = self.img
+        if self.img_hitbox.collidepoint((x,y)): 
+            self.drawing_img = self.hover_img
+    
     
 
 class Tutorial_Button: 

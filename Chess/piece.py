@@ -54,7 +54,6 @@ def is_in_check(local_board, colour_moving): # edit this function when added pie
         for j in range(8):
             if local_board[i][j] != 0:
                 if local_board[i][j].colour == opposite_colour:
-                
                     squares_piece_controls = local_board[i][j].controls(local_board, i,j, opposite_colour)
 
                     for move in squares_piece_controls:
@@ -91,20 +90,19 @@ class Piece:
         self.img_width = 60
         self.width_offset = 5
         self.height_offset = 5
-        # self.set = 'lichess-set'
         self.set = 'set-5'
         self.set = 'set-6'
         self.set = 'lichess-set'
         self.follow_mouse = False
 
-        self.icon_width = 40
-        self.icon_height = 40 
-        self.icon_gap_y = 40 
-        self.icon_gap_x = 20
-        self.white_captured_pieces_box_x = 950
+        self.icon_width = 30
+        self.icon_height = 35
+        self.icon_gap_y = 35
+        self.icon_gap_x = 15
+        self.white_captured_pieces_box_x = 940
         self.white_captured_pieces_box_y = 100 
         self.black_captured_pieces_box_x = 100
-        self.black_captured_pieces_box_y = 500 
+        self.black_captured_pieces_box_y = 525
 
 
     def draw(self, x,y):
